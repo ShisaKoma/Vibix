@@ -1,0 +1,13 @@
+<div class="tree-control" data-tree-control {% if optional %}data-tree-optional{% endif %} data-selection="{% if multiple %}multiple{% else %}single{% endif %}">
+  <div class="tree-tools" hidden>
+    <label class="visually-hidden" for="{{ input_name }}_filter">Rechercher dans {{ tree_label }}</label>
+    <input id="{{ input_name }}_filter" type="search" placeholder="Rechercher…" data-tree-filter>
+    <div class="tree-tool-actions"><button type="button" data-tree-expand>Tout déplier</button><button type="button" data-tree-collapse>Tout replier</button></div>
+  </div>
+  <ul class="category-tree" data-tree-root aria-label="{{ tree_label }}">
+    {% include 'cobweb/tree_nodes.html' %}
+  </ul>
+  <p class="tree-empty muted" hidden>Aucune catégorie correspondante.</p>
+  <p class="tree-selection help-text" aria-live="polite" data-tree-status></p>
+  <p class="tree-validation errorlist" role="alert" hidden>Sélectionnez une catégorie principale pour continuer.</p>
+</div>

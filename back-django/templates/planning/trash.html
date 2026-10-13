@@ -1,0 +1,1 @@
+{% extends 'workspace/base.html' %}{% block workspace_content %}<h1>Corbeille Planning</h1><ul>{% for event in events %}<li><a href="{% url 'planning:detail' site.pk event.pk %}">{{ event.title }}</a></li>{% empty %}<li>La corbeille est vide.</li>{% endfor %}</ul><a href="{% url 'planning:calendar' site.pk %}">Retour au planning</a>{% endblock %}

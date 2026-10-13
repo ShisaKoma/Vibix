@@ -1,0 +1,10 @@
+{% extends 'workspace/base.html' %}
+{% load ui %}
+{% block title %}{{ group.title }} — Groupe Cobweb{% endblock %}
+{% block workspace_content %}
+<div class="page-heading"><h1>{% ui_icon "groups" %}{{ group.title }}</h1>{% if can_group_change %}<a class="button-link" href="{% url 'cobweb:group-edit' site.pk group.pk %}{% if cobweb_function %}?function={{ cobweb_function }}{% endif %}">{% ui_icon "edit" %}<span class="cta-label">Modifier</span></a>{% endif %}</div>
+<section class="panel"><h2>Contenu</h2>{{ group.rendered_content }}{% if group.picture %}<img src="{% url 'media:image' site.pk group.picture_id %}" alt="{{ group.picture.alt_text }}" width="200">{% endif %}<p>Catégorie : {{ group.category.label }}</p><p>Création : {{ group.created_at }} · Modification : {{ group.updated_at }}</p><p>{% if group.is_online %}Publication autorisée{% else %}Hors ligne{% endif %}</p></section>
+<section class="panel"><h2>Composition ordonnée</h2><ol>{% for member in members %}<li><a href="{% url 'cobweb:detail' site.pk member.item_id %}">{{ member.item.title }}</a> · Ordre {{ member.position }}</li>{% empty %}<li>Aucune entrée consultable.</li>{% endfor %}</ol></section>
+<section class="panel"><h2>Liaisons</h2>{% include 'cobweb/record_links.html' %}</section>
+<div class="form-actions"><a href="{% url 'cobweb:group-list' site.pk %}{% if cobweb_function %}?function={{ cobweb_function }}{% endif %}">Retour aux groupes</a><a href="{% url 'cobweb:preview-group' site.pk group.pk %}">Aperçu</a><a href="{% url 'cobweb:public-group' site.pk group.pk %}">Page publique</a>{% if can_group_delete %}<a class="danger-link" href="{% url 'cobweb:group-delete' site.pk group.pk %}">Supprimer le groupe</a>{% endif %}</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends 'products/stock/base.html' %}
+{% block stock_content %}<h1>{{ item }}</h1><p>{% if total != None %}Stock physique total : {{ total }} {{ item.unit }}.{% else %}Aucun emplacement configuré.{% endif %} L'unité est immuable ; les tarifs n'effectuent aucune conversion.</p>
+{% if can_manage_stock %}<p><a href="{% url 'products:stock-balance-create' site.pk item.pk %}">Ajouter un emplacement et son seuil</a></p>{% endif %}
+{% include 'products/stock/balances.html' %}
+<p><a href="{% url 'products:stock-operations' site.pk %}?item={{ item.pk }}">Historique des mouvements de cette déclinaison</a></p>
+<p>Un nouvel emplacement commence à zéro ; enregistrez une entrée pour le stock initial.</p>{% endblock %}

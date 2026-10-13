@@ -1,0 +1,21 @@
+@if (store.data(); as data) {
+      <section class="hero">
+        <p class="eyebrow">LES IDÉES PRENNENT VIE</p>
+        <h1>{{ data.settings.title }}</h1>
+        <p class="intro">{{ data.settings.description }}</p>
+        @if (data.articlesEnabled !== false) { <a class="button" routerLink="/news">Explorer les actualités <span aria-hidden="true">↗</span></a> }
+        <div class="hero-decoration" aria-hidden="true"><span></span><span></span><span></span></div>
+      </section>
+      @for (group of slideshows(); track group.id) { <app-cobweb-group [group]="group" /> }
+      @if (data.articlesEnabled !== false) { <section class="section">
+        <div class="section-heading"><div><p class="eyebrow">LE JOURNAL</p><h2>À la une</h2></div><a routerLink="/news">Toutes les actualités →</a></div>
+        <div class="cards">
+          @for (item of featured(); track item.id) {
+            <article class="card">@if (item.thumbnail; as image) { <img class="editorial-thumbnail" [src]="image.url" [alt]="image.altText" [width]="image.width" [height]="image.height" loading="lazy"> }<p class="eyebrow">{{ label(item.categoryId) }}</p><h3><a [routerLink]="['/news', item.id]">{{ item.title }}</a></h3><p>{{ item.description }}</p><a class="read-link" [routerLink]="['/news', item.id]">Lire l’article <span aria-hidden="true">↗</span></a></article>
+          } @empty { <p class="empty">Aucune actualité à la une pour le moment.</p> }
+        </div>
+      </section> }
+      @if (data.planningEnabled) { <section class="section"><div class="section-heading"><div><p class="eyebrow">LE PROGRAMME</p><h2>Concerts, événements et webinaires</h2></div><a routerLink="/events">Consulter le programme →</a></div></section> }
+      @for (group of partners(); track group.id) { <app-cobweb-group [group]="group" /> }
+      @if (data.pagesEnabled !== false) { <section class="about-band"><p class="eyebrow">POUR ALLER PLUS LOIN</p><h2>Un espace à découvrir.</h2><p>Retrouvez nos pages et les informations utiles à votre visite.</p><a class="button secondary" routerLink="/pages">Découvrir nos pages →</a></section> }
+    }

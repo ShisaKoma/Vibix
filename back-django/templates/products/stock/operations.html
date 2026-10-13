@@ -1,0 +1,4 @@
+{% extends 'products/stock/base.html' %}
+{% block stock_content %}<h1>Mouvements de stock</h1><div class="form-actions">{% if can_record_stock_movement %}<a href="{% url 'products:stock-movement' site.pk 'entry' %}">Entrée</a><a href="{% url 'products:stock-movement' site.pk 'exit' %}">Sortie</a>{% endif %}{% if can_transfer_stock %}<a href="{% url 'products:stock-movement' site.pk 'transfer' %}">Transfert</a>{% endif %}</div>
+<form method="get" class="panel"><div class="form-grid">{% for field in form %}{% include 'workspace/field.html' %}{% endfor %}</div>{{ form.non_field_errors }}<button type="submit">Filtrer l'historique</button></form>
+<ul>{% for row in page %}<li><a href="{% url 'products:stock-operation' site.pk row.pk %}">{{ row.get_kind_display }} — {{ row.reference }}</a> · {{ row.created_at }} · {{ row.actor }}</li>{% empty %}<li>Aucun mouvement enregistré.</li>{% endfor %}</ul>{% include 'products/stock/pagination.html' %}{% endblock %}

@@ -1,0 +1,41 @@
+<section class="contact-page">
+  <p class="eyebrow">Écrivez-nous</p><h1>Contact</h1>
+  @if (store.config.dataMode !== 'api') { <p class="empty">Le formulaire connecté est disponible en mode API uniquement.</p> }
+  @else if (!store.data()?.contactsEnabled) { <p class="empty">Ce site n’accepte pas de demandes de contact actuellement.</p> }
+  @else if (accepted()) { <div class="empty" role="status"><h2>Votre demande a été reçue</h2><p>Merci de nous avoir écrit.</p><button class="button secondary" type="button" (click)="newMessage()">Envoyer une autre demande</button></div> }
+  @else {
+    @if (error()) { <p class="empty" role="alert">{{ error() }}</p> }
+    @if (loading()) { <p role="status">Préparation du formulaire…</p> }
+    @if (waitSeconds()) { <p role="status">Vous pourrez réessayer dans {{ waitSeconds() }} seconde{{ waitSeconds() > 1 ? 's' : '' }}.</p> }
+    @if (expired() && !uncertain()) { <p role="status">Le formulaire a expiré. Rechargez-le pour envoyer votre texte.</p> }
+    @if (uncertain()) { <p>La réponse à l’envoi précédent s’est perdue. Le formulaire reste inchangé pour réessayer le même envoi.</p> }
+    @if (availableForms().length > 1) { <label>Formulaire<select name="contact-form-type" [ngModel]="selectedType" (ngModelChange)="selectForm($event)" [disabled]="sending() || loading() || uncertain() || waitSeconds() > 0">@for (item of availableForms(); track item.code) { <option [value]="item.code">{{ item.label }}</option> }</select></label> }
+    @if (previousAnswers().length) { <aside><h2>Réponses à reprendre</h2><p>Ces questions ont changé. Vos anciennes réponses sont conservées ici pour vous permettre de les reprendre.</p>@for (answer of previousAnswers(); track $index) { <p><strong>{{ answer.label }}</strong></p><p class="contact-message">{{ answer.value }}</p> }</aside> }
+    @if (challenge(); as token) {
+      <p>Les champs marqués d’un astérisque sont requis. Durée de conservation prévue pour le traitement de la demande : {{ token.retention_days }} jours.</p>
+      <form (ngSubmit)="submit()" #form="ngForm" class="contact-form">
+        <fieldset [disabled]="sending() || uncertain()"><legend>Votre demande</legend><div class="contact-fields">
+          <label>Nom *<input name="name" [attr.aria-invalid]="fieldErrors()['name']?.length ? 'true' : null" [attr.aria-describedby]="fieldErrors()['name']?.length ? 'contact-name-error' : null" [(ngModel)]="name" required maxlength="200" autocomplete="family-name"></label>
+          <label>Prénom<input name="first_name" [attr.aria-invalid]="fieldErrors()['first_name']?.length ? 'true' : null" [attr.aria-describedby]="fieldErrors()['first_name']?.length ? 'contact-first_name-error' : null" [(ngModel)]="first_name" maxlength="100" autocomplete="given-name"></label>
+          <label>Courriel *<input name="email" [attr.aria-invalid]="fieldErrors()['email']?.length ? 'true' : null" [attr.aria-describedby]="fieldErrors()['email']?.length ? 'contact-email-error' : null" [(ngModel)]="email" required type="email" maxlength="254" autocomplete="email"></label>
+          <label>Téléphone<input name="phone" [attr.aria-invalid]="fieldErrors()['phone']?.length ? 'true' : null" [attr.aria-describedby]="fieldErrors()['phone']?.length ? 'contact-phone-error' : null" [(ngModel)]="phone" type="tel" maxlength="32" autocomplete="tel"></label>
+        </div>
+        <label>Organisation<input name="organization" [attr.aria-invalid]="fieldErrors()['organization']?.length ? 'true' : null" [attr.aria-describedby]="fieldErrors()['organization']?.length ? 'contact-organization-error' : null" [(ngModel)]="organization" maxlength="200" autocomplete="organization"></label>
+        <label>Objet *<input name="title" [attr.aria-invalid]="fieldErrors()['title']?.length ? 'true' : null" [attr.aria-describedby]="fieldErrors()['title']?.length ? 'contact-title-error' : null" [(ngModel)]="title" required maxlength="200"></label>
+        <label>Message *<textarea name="message" [attr.aria-invalid]="fieldErrors()['message']?.length ? 'true' : null" [attr.aria-describedby]="fieldErrors()['message']?.length ? 'contact-message-error' : null" [(ngModel)]="message" required [maxlength]="token.max_message_length" rows="8"></textarea></label>
+        @if (token.form; as definition) {
+          @for (question of definition.questions; track question.key) {
+            <label>{{ question.label }}{{ question.required ? ' *' : '' }}<textarea [name]="question.key" [(ngModel)]="answers[question.key]" [required]="question.required" maxlength="2000" rows="2" [attr.aria-invalid]="fieldErrors()[question.key]?.length ? 'true' : null" [attr.aria-describedby]="fieldErrors()[question.key]?.length ? 'contact-' + question.key + '-error' : null"></textarea></label>
+            <div [id]="'contact-' + question.key + '-error'">@for (issue of fieldErrors()[question.key] || []; track $index) { <p role="alert">{{ question.label }} : {{ issue.message }}</p> }</div>
+          }
+        }
+        @for (field of fields; track field) {
+          <div [id]="'contact-' + field + '-error'">@for (issue of fieldErrors()[field] || []; track $index) { <p role="alert">{{ fieldLabels[field] }} : {{ issue.message }}</p> }</div>
+        }
+        </fieldset><button class="button" type="submit" [disabled]="sending() || waitSeconds() > 0 || (!uncertain() && (form.invalid || expired()))">{{ sending() ? 'Envoi en cours…' : uncertain() ? 'Réessayer le même envoi' : 'Envoyer la demande' }}</button>
+      </form>
+    }
+    @if (uncertain()) { <label class="contact-restart"><input name="confirm-new" type="checkbox" [(ngModel)]="confirmNew">Je souhaite recommencer malgré l’absence de confirmation de l’envoi précédent. Cela peut créer un doublon.</label> }
+    <button class="button secondary" type="button" (click)="prepare()" [disabled]="loading() || sending() || waitSeconds() > 0 || (uncertain() && !confirmNew)">{{ uncertain() ? 'Préparer un nouvel envoi' : 'Recharger le formulaire' }}</button>
+  }
+</section>

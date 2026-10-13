@@ -1,0 +1,9 @@
+{% extends 'workspace/base.html' %}{% load ui site_permissions %}
+{% block title %}Réservations — {{ site.name }}{% endblock %}
+{% block workspace_content %}
+{% site_permission site 'planning.view_event' as can_view_events %}
+{% site_permission site 'products.view_product' as can_read_products %}
+<nav class="subnav" aria-label="Planning et réservations">{% if can_view_events %}<a href="{% url 'planning:calendar' site.pk %}">Événements</a>{% endif %}<a href="{% url 'planning:booking-list' site.pk %}">Réservations</a>{% if can_read_products %}<a href="{% url 'planning:booking-availability' site.pk %}">Disponibilités</a>{% endif %}{% for link in configuration_links %}<a href="{% url 'planning:booking-config' site.pk link.kind %}">{{ link.title }}</a>{% endfor %}</nav>
+<p class="eyebrow">Réservations internes · capacité exclusive 1 · confirmation manuelle</p>
+{% block booking_content %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,27 @@
+<section class="page-heading"><p class="eyebrow">Catalogue</p><h1>Produits</h1><p>Découvrez les produits publiés sur ce site.</p></section>
+<form class="product-filters" (ngSubmit)="apply()">
+  <label>Référence, titre ou texte<input name="q" [(ngModel)]="filters['q']" maxlength="200" type="search"></label>
+  <label>Catégorie<select name="category_id" [(ngModel)]="filters['category_id']"><option value="">Toutes les catégories</option>@for (category of categories(); track category.id) { <option [value]="category.id">{{ categoryLabel(category) }}</option> }</select></label>
+  <label>Marque<select name="brand_id" [(ngModel)]="filters['brand_id']"><option value="">Toutes les marques</option>@for (brand of brands(); track brand.id) { <option [value]="brand.id">{{ brand.name }}</option> }</select></label>
+  <label>Langue<input name="language" [(ngModel)]="filters['language']" maxlength="64" placeholder="Code, par exemple fr"></label>
+  <label>Tri<select name="order" [(ngModel)]="filters['order']"><option value="">Ordre du catalogue</option><option value="title">Titre A → Z</option><option value="-title">Titre Z → A</option><option value="-created_at">Création récente</option><option value="created_at">Création ancienne</option></select></label>
+  <label>Favori éditorial<select name="featured" [(ngModel)]="filters['featured']"><option value="">Tous</option><option value="true">Oui</option><option value="false">Non</option></select></label>
+  <label>Nouveauté<select name="new" [(ngModel)]="filters['new']"><option value="">Tous</option><option value="true">Oui</option><option value="false">Non</option></select></label>
+  <label>À l’accueil<select name="in_home" [(ngModel)]="filters['in_home']"><option value="">Tous</option><option value="true">Oui</option><option value="false">Non</option></select></label>
+  <label>Offre réservable<select name="reservable" [(ngModel)]="filters['reservable']"><option value="">Toutes</option><option value="true">Gestion interne</option><option value="false">Non réservable</option></select></label>
+  <div class="form-actions"><button type="submit">Appliquer les filtres</button><button type="button" (click)="reset()">Réinitialiser</button></div>
+</form>
+@if (referencesError()) { <p role="alert">Filtres : {{ referencesError() }} <button type="button" (click)="loadReferences()">Recharger les filtres</button></p> }
+@if (loading()) { <p class="empty" role="status">Chargement du catalogue…</p> }
+@else if (error()) { <section class="empty"><h2>Catalogue indisponible</h2><p role="alert">{{ error() }}</p><button type="button" (click)="load()">Réessayer</button><button type="button" (click)="reset()">Revenir à la première page</button></section> }
+@else if (data(); as page) {
+  <p role="status">{{ page.count }} produit{{ page.count === 1 ? '' : 's' }} — page {{ page.page }} sur {{ page.pages }}</p>
+  <div class="cards product-cards">@for (product of page.results; track product.id) {
+    <article class="card">@if (product.thumbnail || product.picture; as image) { <img class="editorial-thumbnail" [src]="image.url" [alt]="image.alt_text" loading="lazy" [width]="image.width" [height]="image.height"> }
+      <p class="eyebrow">{{ product.category_label }}</p><h2><a [routerLink]="['/products', product.id]" [queryParams]="query()">{{ product.title }}</a></h2>
+      <p>{{ product.summary }}</p><p class="product-reference">{{ product.reference }}@if (product.brand) { · {{ product.brand.name }} }</p>
+      @if (product.new) { <span class="product-badge">Nouveauté</span> }@if (product.featured) { <span class="product-badge">Favori éditorial</span> }
+    </article>
+  } @empty { <p class="empty">Aucun produit publié ne correspond à votre recherche.</p> }</div>
+  @if (page.pages > 1) { <nav class="product-pagination" aria-label="Pagination du catalogue">@if (page.page > 1) { <a routerLink="/products" [queryParams]="{page: page.page - 1}" queryParamsHandling="merge">Page précédente</a> }@if (page.page < page.pages) { <a routerLink="/products" [queryParams]="{page: page.page + 1}" queryParamsHandling="merge">Page suivante</a> }</nav> }
+}

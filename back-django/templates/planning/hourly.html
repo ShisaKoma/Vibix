@@ -1,0 +1,41 @@
+{% load tz l10n %}
+<p id="planning-scale">La hauteur des blocs indique leur durée. Les événements simultanés sont côte à côte. Les créneaux très courts ont un repère agrandi ; consultez leur fiche pour les horaires exacts.</p>
+<noscript><p>Sans JavaScript, les événements sont présentés en liste par jour. La vue Agenda est aussi disponible.</p></noscript>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Calendrier horaire, défilement horizontal" aria-describedby="planning-scale">
+  <div class="scheduler-clock" data-planning-clock data-days="{{ timed_days|length }}">
+    <div class="scheduler-clock-headings">
+      {% for day in timed_days %}<h3><time datetime="{{ day.date|date:'Y-m-d' }}">{{ day.date|date:'l d/m' }}</time>{% if day.minutes != 1440 %}<small class="scheduler-clock-dst">Changement d’heure · décalages UTC indiqués</small>{% endif %}</h3>{% endfor %}
+    </div>
+    <div class="scheduler-clock-alldays">
+      {% for day in timed_days %}
+      <section data-planning-drop data-drop-kind="all-day" data-date="{{ day.date|date:'Y-m-d' }}" data-timezone="{{ display_timezone }}" aria-label="Journées entières du {{ day.date|date:'d F Y' }}">
+        <p class="muted">Journée entière · {{ day.date|date:'d/m' }}</p>
+        {% for event in day.all_day_events %}{% include 'planning/card.html' %}{% empty %}<p class="muted">—</p>{% endfor %}
+      </section>
+      {% endfor %}
+    </div>
+    <div class="scheduler-clock-scroll" tabindex="0" role="region" aria-label="Heures, défilement vertical">
+      <div class="scheduler-clock-days">
+        {% for day in timed_days %}
+        <section class="scheduler-clock-day" data-clock-day data-planning-drop data-drop-kind="timed" data-date="{{ day.date|date:'Y-m-d' }}" data-timezone="{{ display_timezone }}" data-minutes="{{ day.minutes|unlocalize }}" data-lanes="{{ day.max_lanes }}" aria-label="Horaires du {{ day.date|date:'d F Y' }}">
+          <h3 class="scheduler-clock-fallback">{{ day.date|date:'l d F' }}</h3>
+          <div class="scheduler-clock-slots" aria-label="Créneaux horaires">
+            {% for slot in day.slots %}
+            <div class="scheduler-clock-slot" data-clock-slot data-offset="{{ slot.offset|unlocalize }}" data-duration="{{ slot.duration|unlocalize }}" data-date="{{ day.date|date:'Y-m-d' }}" data-timezone="{{ display_timezone }}" data-hour="{{ slot.hour }}">
+              <span class="scheduler-clock-label" aria-hidden="true">{{ slot.label }}{% if day.minutes != 1440 %}<small>{{ slot.utc_offset }}</small>{% endif %}</span>
+              {% if can_add %}<a class="scheduler-clock-create" href="{% url 'planning:create' site.pk %}?date={{ day.date|date:'Y-m-d' }}&amp;hour={{ slot.hour }}&amp;timezone={{ display_timezone|urlencode }}" aria-label="Ajouter le {{ day.date|date:'d F Y' }} à {{ slot.label }}, UTC{{ slot.utc_offset }}">+</a>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% for block in day.blocks %}
+          <div class="scheduler-timed" data-clock-event data-offset="{{ block.offset|unlocalize }}" data-duration="{{ block.duration|unlocalize }}" data-lane="{{ block.lane }}" data-lanes="{{ block.lanes }}">
+            {% if block.continues_before or block.continues_after %}<p class="scheduler-continuation">{% if block.continues_before %}Suite de la veille{% endif %}{% if block.continues_before and block.continues_after %} · {% endif %}{% if block.continues_after %}Continue demain{% endif %}</p>{% endif %}
+            {% include 'planning/card.html' with event=block.event segment=block %}
+          </div>
+          {% empty %}<p class="scheduler-clock-empty">Aucun événement horaire.</p>{% endfor %}
+        </section>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

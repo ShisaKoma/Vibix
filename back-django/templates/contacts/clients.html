@@ -1,0 +1,8 @@
+{% extends 'workspace/base.html' %}
+{% block title %}Clients API Contacts — ViBix{% endblock %}
+{% block workspace_content %}
+<h1>Clients API Contacts</h1><p class="muted">Ces jetons permettent uniquement de soumettre une demande à ce site. Ils ne donnent aucun accès aux messages reçus ni au carnet. Conservez-les sur votre serveur, jamais dans un front public.</p>
+{% if token %}<section class="panel"><h2>Jeton créé</h2><p role="status">Copiez ce jeton maintenant : il ne sera plus affiché après avoir quitté cette page.</p><code class="contact-token">{{ token }}</code></section>{% endif %}
+<section class="panel"><h2>Créer un accès</h2><form method="post">{% csrf_token %}{{ form.non_field_errors }}{% for field in form %}{% include 'workspace/field.html' %}{% endfor %}<button type="submit">Créer un client API</button></form></section>
+<section class="panel"><h2>Accès du site</h2><ul>{% for client in clients %}<li>{{ client.name }} · expire le {{ client.expires_at|date:'d/m/Y H:i' }} · {% if client.revoked_at %}révoqué{% else %}<a href="{% url 'contacts:client-revoke' site.pk client.pk %}">Révoquer</a>{% endif %}</li>{% empty %}<li>Aucun client API.</li>{% endfor %}</ul></section><a href="{% url 'contacts:list' site.pk %}">Retour aux contacts</a>
+{% endblock %}

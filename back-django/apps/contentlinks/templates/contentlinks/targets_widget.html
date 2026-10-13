@@ -1,0 +1,13 @@
+<div class="content-links-picker"{% if widget.attrs.id %} id="{{ widget.attrs.id }}"{% endif %} tabindex="-1">
+  {% for section in widget.sections %}
+  <fieldset class="content-links-module"><legend>{{ section.label }}</legend>
+    {% for group in section.groups %}
+      {% if group.label %}<details class="content-links-category"{% if group.selected %} open{% endif %}><summary>{{ group.label }} <span class="muted">({{ group.options|length }})</span></summary>{% endif %}
+      <div class="content-links-options">
+        {% for option in group.options %}<div class="content-links-option">{% include option.template_name with widget=option %}</div>{% endfor %}
+      </div>
+      {% if group.label %}</details>{% endif %}
+    {% endfor %}
+  </fieldset>
+  {% empty %}<p class="muted">Aucun autre contenu accessible à associer sur ce site.</p>{% endfor %}
+</div>

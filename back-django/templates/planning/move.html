@@ -1,0 +1,7 @@
+{% extends 'workspace/base.html' %}{% load tz %}
+{% block workspace_content %}<h1>Déplacer {{ event.title }}</h1>
+{% timezone event.timezone %}<p>Horaire actuel : {{ event.starts_at|date:'d F Y H:i' }} — {{ event.ends_at|date:'d F Y H:i' }} ({{ event.timezone }}).</p>{% endtimezone %}
+<p>La durée et les ressources sont conservées.{% if event.series_id %} Seule cette occurrence sera déplacée et deviendra une exception. <a href="{% url 'planning:series-edit' site.pk event.series_id %}">Modifier toute la série</a>.{% endif %}</p>
+<form method="post" class="panel">{% csrf_token %}{{ form.version }}{% if form.errors %}<div role="alert"><h2>Vérifiez votre saisie</h2>{{ form.non_field_errors }}{% for field in form %}{% if field.errors %}<p>{{ field.label }} : {{ field.errors|striptags }}</p>{% endif %}{% endfor %}</div>{% endif %}
+<div class="form-grid">{% for field in form %}{% if not field.is_hidden %}{% include 'workspace/field.html' %}{% endif %}{% endfor %}</div>
+<div class="form-actions"><button type="submit">Confirmer le déplacement</button><a href="{% url 'planning:detail' site.pk event.pk %}">Annuler</a></div></form>{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'products/stock/base.html' %}
+{% block stock_content %}
+<h1>Stocks et seuils</h1><p>{{ low_count }} stock{{ low_count|pluralize }} au seuil ou en dessous sur ce site.</p>
+<form method="get" class="panel"><div class="form-grid">{% for field in form %}{% include 'workspace/field.html' %}{% endfor %}</div>{{ form.non_field_errors }}<button type="submit">Filtrer</button></form>
+{% if can_manage_stock %}<p><a href="{% url 'products:stock-item-create' site.pk %}">Configurer le stock d'une déclinaison</a></p>{% endif %}
+{% include 'products/stock/balances.html' %}
+<p>Quantités privées, dans l'unité propre à chaque déclinaison. Les réservations de créneaux et les tarifs ne modifient pas ces stocks.</p>
+{% endblock %}

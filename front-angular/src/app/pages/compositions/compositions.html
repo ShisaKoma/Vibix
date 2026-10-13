@@ -1,0 +1,10 @@
+<section class="page-heading"><p class="eyebrow">COBWEB</p><h1>Nos compositions</h1><p>Les partenaires, diaporamas et ressources publiés de notre site.</p></section>
+@for (group of groups(); track group.id) { <app-cobweb-group [group]="group" /> }
+@if (items().length) {
+  <section class="section"><div class="section-heading"><div><p class="eyebrow">RESSOURCES PUBLIÉES</p><h2>Entrées Cobweb</h2></div></div>
+    <div class="cards">@for (item of items(); track item.id) {
+      <article class="card">@if (item.thumbnail || item.picture; as image) { <img class="partner-image" [src]="image.url" [alt]="image.altText" [width]="image.width" [height]="image.height" loading="lazy"> }<h3><a [routerLink]="['/compositions', item.id]">{{ item.title }}</a></h3><p>{{ item.description }}</p><a class="read-link" [routerLink]="['/compositions', item.id]">Voir la ressource →</a></article>
+    }</div>
+  </section>
+}
+@if (!groups().length && !items().length) { <p class="empty">Aucun contenu Cobweb publié pour le moment.</p> }

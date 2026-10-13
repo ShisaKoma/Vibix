@@ -1,0 +1,7 @@
+{% extends 'workspace/base.html' %}
+{% block title %}{% if restore %}Restaurer{% else %}Archiver{% endif %} — Carnet — ViBix{% endblock %}
+{% block workspace_content %}
+<h1>{% if restore %}Restaurer{% else %}Archiver{% endif %} {{ entry }}</h1>
+<p>{% if restore %}La fiche retrouvera son état actif ou inactif précédent.{% else %}La fiche et ses coordonnées seront conservées. Une organisation avec des rattachements ouverts ne peut pas être archivée.{% endif %}</p>
+<form method="post" class="panel">{% csrf_token %}{{ form.version }}{{ form.errors }}<div class="form-actions"><button type="submit">Confirmer {% if restore %}la restauration{% else %}l’archivage{% endif %}</button><a href="{% url 'addressbook:detail' site.pk entry.pk %}">Annuler</a></div></form>
+{% endblock %}

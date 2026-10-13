@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Première connexion — ViBix{% endblock %}
+{% block content %}
+<section class="panel first-run">
+  <p class="eyebrow">Bienvenue dans ViBix</p>
+  <h1>{% ui_icon "sites" %}Préparons votre espace</h1>
+  <p>Choisissez le site à ouvrir en premier. Vous pourrez toujours consulter les autres sites autorisés depuis l’accueil.</p>
+  {% if site_cards %}
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <button type="submit">Continuer vers ViBix</button>
+  </form>
+  {% else %}
+  <p class="notice" role="status">Aucun site n’est encore attribué à votre compte. Un administrateur doit vous donner accès à un site avant que vous puissiez continuer.</p>
+  {% endif %}
+</section>
+{% if site_cards %}
+<section class="setup-guidance">
+  <h2>Préparer un site</h2>
+  <p>Les catégories et listes déroulantes servent de référentiels aux futurs formulaires. Votre administrateur de site peut les préparer avant l’ouverture des modules.</p>
+  <div class="grid">
+    {% for card in site_cards %}
+      {% if card.can_manage_settings %}
+      <article class="panel">
+        <h3>{{ card.site.name }}</h3>
+        <p>Créez les catégories et les listes de choix pour les modules de ce site.</p>
+        <a class="button-link" href="{% url 'configuration:site-settings' card.site.pk %}">Ouvrir les paramètres du site</a>
+      </article>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

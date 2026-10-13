@@ -1,0 +1,2 @@
+{% extends 'workspace/base.html' %}
+{% load ui %}{% block workspace_content %}<h1>{% ui_icon "groups" %}Supprimer {{ group.title }}</h1><p>La composition et les liaisons du groupe seront supprimées. Les entrées seront conservées.</p><form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">{% ui_icon "delete" %}<span class="cta-label">Supprimer le groupe</span></button><a href="{% url 'cobweb:group-detail' site.pk group.pk %}">{% ui_icon "cancel" %}<span class="cta-label">Annuler</span></a></form>{% endblock %}

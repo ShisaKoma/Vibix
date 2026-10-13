@@ -1,0 +1,14 @@
+<section class="section">
+  <p class="eyebrow">LE PROGRAMME</p><h1>Événements</h1><p>Concerts, rencontres et webinaires à découvrir.</p>
+  <form class="event-filters" (ngSubmit)="load()"><label>Du <input type="date" name="start" [(ngModel)]="start" required></label><label>Au (date exclusive) <input type="date" name="end" [(ngModel)]="end" required></label><label>Type <select name="kind" [(ngModel)]="kind"><option value="">Tous les types</option><option value="event">Événements</option><option value="concert">Concerts</option><option value="webinar">Webinaires</option></select></label><button class="button" type="submit">Afficher</button></form>
+  <p class="muted">Le filtre de période utilise UTC ; chaque événement affiche son propre fuseau.</p>
+  @if (loading()) { <p role="status">Chargement des événements…</p> }
+  @else if (error()) { <p role="alert">{{ error() }}</p> }
+  @else {
+    <p role="status">{{ count() }} événement(s)</p>
+    <div class="cards">@for (event of events(); track event.id) {
+      <article class="card"><p class="eyebrow">{{ label(event.kind) }}</p><h2>{{ event.title }}</h2><p><time [attr.datetime]="event.starts_at">{{ date(event) }}</time><br>Fin : <time [attr.datetime]="event.ends_at">{{ date(event, true) }}</time>{{ event.all_day ? ' (fin exclusive)' : '' }}<br>{{ event.timezone }}{{ event.all_day ? ' · Journée entière' : '' }}</p><p>{{ event.location }}</p><p class="event-description">{{ event.description }}</p>@if (event.link) { <a class="read-link" [href]="event.link" rel="noopener">En savoir plus sur {{ event.title }} →</a> }</article>
+    } @empty { <p class="empty">Aucun événement publié dans cette période.</p> }</div>
+    @if (pages() > 1) { <nav aria-label="Pagination des événements"><button class="button secondary" [disabled]="page() <= 1" (click)="load(page() - 1)">Précédent</button><span>Page {{ page() }} sur {{ pages() }}</span><button class="button secondary" [disabled]="page() >= pages()" (click)="load(page() + 1)">Suivant</button></nav> }
+  }
+</section>

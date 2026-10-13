@@ -1,0 +1,23 @@
+<section class="section cobweb-section" [attr.aria-label]="group().title">
+  <div class="section-heading"><div><p class="eyebrow">{{ group().partners ? 'NOS PARTENAIRES' : group().presentation === 'slideshow' ? 'LES MOMENTS DU COLLECTIF' : 'À DÉCOUVRIR' }}</p><h2>{{ group().title }}</h2></div></div>
+  <div class="group-description" [innerHTML]="group().contentHtml"></div>
+  @if (group().presentation === 'slideshow') {
+    @if (active(); as item) {
+      <div class="slideshow" aria-roledescription="diaporama">
+        @if (item.picture || item.thumbnail; as image) { <img class="slide-image" [src]="image.url" [alt]="image.altText" [width]="image.width" [height]="image.height"> }
+        <div class="slide-caption" aria-live="polite" aria-atomic="true"><p class="eyebrow">{{ index() + 1 }} / {{ group().members.length }}</p><h3>{{ item.title }}</h3><p>{{ item.description }}</p>@if (item.link) { <a [href]="item.link" rel="noopener noreferrer">En savoir plus →</a> }</div>
+        @if (group().members.length > 1) { <div class="slide-controls"><button type="button" (click)="move(-1)" aria-label="Diapositive précédente">←</button><button type="button" (click)="move(1)" aria-label="Diapositive suivante">→</button></div> }
+      </div>
+    } @else { <p class="empty">Aucune diapositive publiée pour le moment.</p> }
+  } @else {
+    <div [class]="group().presentation === 'list' ? 'cobweb-list' : 'cards partner-cards'">
+      @for (member of group().members; track member.item.id) {
+        <article class="card">
+          @if (member.item.thumbnail || member.item.picture; as image) { <img class="partner-image" [src]="image.url" [alt]="image.altText" [width]="image.width" [height]="image.height" loading="lazy"> }
+          <h3>{{ member.item.title }}</h3><p>{{ member.item.description }}</p><div class="rich-snippet" [innerHTML]="member.item.contentHtml"></div>
+          @if (member.item.link) { <a class="read-link" [href]="member.item.link" rel="noopener noreferrer">{{ group().partners ? 'Découvrir le partenaire' : 'Consulter la ressource' }} <span aria-hidden="true">↗</span></a> }
+        </article>
+      } @empty { <p class="empty">Aucun élément publié dans cette composition.</p> }
+    </div>
+  }
+</section>

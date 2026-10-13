@@ -1,0 +1,135 @@
+{% extends "workspace/base.html" %}
+{% load ui %}
+{% block title %}Paramètres — {{ site.name }} — ViBix{% endblock %}
+{% block breadcrumb %}<span aria-hidden="true">/</span><span>Paramètres</span>{% endblock %}
+{% block workspace_content %}
+<h1>{% module_label "settings" %}</h1>
+<p class="muted">Personnalisez {{ site.name }}, ses accès et ses communications. Chaque section s’enregistre séparément.</p>
+<div class="settings-sections">
+<details class="panel settings-section" {% if form.errors or not smtp_form.is_bound and not contact_form.is_bound and not availability_form.is_bound %}open{% endif %}>
+  <summary>Identité et apparence</summary>
+<form class="site-settings-form" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="hidden" name="settings_section" value="identity">
+  <h2>Identité du site</h2>
+  <p class="muted">Une icône et une courte description pour retrouver facilement ce site.</p>
+  {{ form.non_field_errors }}
+  <div class="site-icon-preview">
+    {% if site.icon %}<img class="site-icon" src="{% url 'site-icon' site.pk %}" width="48" height="48" alt="Icône actuelle de {{ site.name }}">{% else %}<span class="site-icon site-icon-placeholder" aria-hidden="true">{{ site.name|first|upper }}</span>{% endif %}
+    <strong>{{ site.name }}</strong>
+  </div>
+  {% include "workspace/field.html" with field=form.icon %}
+  {% include "workspace/field.html" with field=form.description %}
+  <h2>Couleurs du site</h2>
+  <p class="muted">Ces quatre couleurs sont disponibles dans l’API pour personnaliser vos interfaces.</p>
+  <div class="site-color-groups">
+    <fieldset><legend>Couleurs principales</legend><div class="site-color-fields">
+      {% include "workspace/field.html" with field=form.primary_color_1 %}
+      {% include "workspace/field.html" with field=form.primary_color_2 %}
+    </div></fieldset>
+    <fieldset><legend>Couleurs secondaires</legend><div class="site-color-fields">
+      {% include "workspace/field.html" with field=form.secondary_color_1 %}
+      {% include "workspace/field.html" with field=form.secondary_color_2 %}
+    </div></fieldset>
+  </div>
+  <div class="form-actions"><button type="submit">{% ui_icon "save" %}<span class="cta-label">Enregistrer les paramètres</span></button></div>
+</form>
+</details>
+<details class="panel settings-section" {% if availability_form.is_bound %}open{% endif %}>
+  <summary>Modules et accès publics</summary>
+<form class="site-settings-form" method="post">
+  {% csrf_token %}
+  <input type="hidden" name="settings_section" value="availability">
+  <p class="muted">Désactiver un module masque sa navigation et bloque ses pages de gestion ainsi que ses contenus publics. Les données sont conservées pour une réactivation ultérieure.</p>
+  {{ availability_form.non_field_errors }}
+  <fieldset><legend>Modules du site</legend>
+    {% include "workspace/field.html" with field=availability_form.articles_enabled %}
+    {% include "workspace/field.html" with field=availability_form.pages_enabled %}
+    {% include "workspace/field.html" with field=availability_form.cobweb_enabled %}
+    {% include "workspace/field.html" with field=availability_form.addressbook_enabled %}
+    {% include "workspace/field.html" with field=availability_form.contacts_enabled %}
+    {% include "workspace/field.html" with field=availability_form.planning_enabled %}
+  </fieldset>
+  <fieldset><legend>Exposition externe du site</legend>
+    {% include "workspace/field.html" with field=availability_form.public_access_enabled %}
+    {% include "workspace/field.html" with field=availability_form.mcp_access_enabled %}
+  </fieldset>
+  <div class="form-actions"><button type="submit">{% ui_icon "save" %}<span class="cta-label">Enregistrer la disponibilité</span></button></div>
+</form>
+</details>
+<details class="panel settings-section" {% if smtp_form.is_bound %}open{% endif %}>
+  <summary>Messagerie SMTP</summary>
+  <p class="muted">Utilisez le serveur de messagerie propre à ce site. Aucun message n’est envoyé lors de l’enregistrement.</p>
+  <form class="site-settings-form" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="settings_section" value="smtp">
+    {{ smtp_form.version }}
+    {{ smtp_form.non_field_errors }}
+    {% include "workspace/field.html" with field=smtp_form.smtp_enabled %}
+    <div class="form-grid">
+      {% include "workspace/field.html" with field=smtp_form.smtp_host %}
+      {% include "workspace/field.html" with field=smtp_form.smtp_port %}
+      {% include "workspace/field.html" with field=smtp_form.smtp_security %}
+      {% include "workspace/field.html" with field=smtp_form.smtp_username %}
+      {% include "workspace/field.html" with field=smtp_form.smtp_from_email %}
+      {% include "workspace/field.html" with field=smtp_form.smtp_from_name %}
+    </div>
+    <p>Mot de passe SMTP : {% if smtp_password_configured %}<strong>configuré sur le serveur</strong>{% else %}<strong>non configuré</strong>{% endif %}.</p>
+    <p class="help-text">L’administrateur technique installe le mot de passe et autorise le serveur SMTP. Le secret n’est jamais affiché ici.</p>
+    <div class="form-actions"><button type="submit">{% ui_icon "save" %}<span class="cta-label">Enregistrer SMTP</span></button></div>
+  </form>
+</details>
+<details class="panel settings-section" {% if contact_form.is_bound %}open{% endif %}>
+  <summary>Réception des contacts</summary>
+  <p><a href="{% url 'contacts:definitions' site.pk %}">Configurer les types de formulaire et leurs questions →</a></p>
+  <p class="muted">Réglez les limites de réception, la détection antispam et les propositions de liaison au carnet. Activez Contacts dans « Modules et accès publics » pour ouvrir le formulaire.</p>
+  <form class="site-settings-form" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="settings_section" value="contact">
+    {{ contact_form.version }}
+    {{ contact_form.non_field_errors }}
+    {% include "workspace/field.html" with field=contact_form.contact_recipient %}
+    <fieldset><legend>Limites de réception</legend>
+      <div class="form-grid">
+        {% include "workspace/field.html" with field=contact_form.contact_hourly_limit %}
+        {% include "workspace/field.html" with field=contact_form.contact_ip_hourly_limit %}
+        {% include "workspace/field.html" with field=contact_form.contact_max_length %}
+        {% include "workspace/field.html" with field=contact_form.contact_retention_days %}
+      </div>
+    </fieldset>
+    <fieldset><legend>Détection antispam</legend>
+      {% include "workspace/field.html" with field=contact_form.spam_terms %}
+      {% include "workspace/field.html" with field=contact_form.spam_scan_content %}
+      {% include "workspace/field.html" with field=contact_form.spam_scan_metadata %}
+      <p class="help-text">Une correspondance signale la demande comme suspecte pour validation avant notification ou liaison au carnet.</p>
+    </fieldset>
+    <fieldset><legend>Carnet d’adresses</legend>
+      {% include "workspace/field.html" with field=contact_form.contact_addressbook_mode %}
+      <p class="help-text">Un agent autorisé confirme l’ajout ou la mise à jour après aperçu. Les demandes publiques ne modifient jamais directement une fiche.</p>
+    </fieldset>
+    <div class="form-actions"><button type="submit">{% ui_icon "save" %}<span class="cta-label">Enregistrer les règles Contacts</span></button></div>
+  </form>
+</details>
+<details class="panel settings-section">
+  <summary>Catégories et listes</summary>
+<section>
+  <h2>Fonctions Cobweb</h2>
+  <p class="muted">Les catégories racines actives pilotent les raccourcis Cobweb. Désactiver toutes les racines d’un même code masque le raccourci et bloque sa vue dédiée ; les autres catégories restent gérables.</p>
+  <ul>
+    {% for function in cobweb_functions %}<li>{{ function.label }} — {% if function.active %}visible{% else %}masquée{% endif %}</li>{% endfor %}
+  </ul>
+  <p><a href="{% url 'configuration:lookup-lists' site.pk 'category' %}?module=cobweb">Gérer les catégories Cobweb →</a></p>
+</section>
+<h2>Référentiels</h2>
+<p class="muted">Configurez les catégories et les listes utilisées dans les formulaires de ce site.</p>
+<div class="grid">
+  {% for kind, label in kinds %}
+  <section class="panel">
+    <h3>{{ label }}</h3>
+    <a href="{% url 'configuration:lookup-lists' site.pk kind %}">Gérer {{ label|lower }} →</a>
+  </section>
+  {% endfor %}
+</div>
+</details>
+</div>
+{% endblock %}

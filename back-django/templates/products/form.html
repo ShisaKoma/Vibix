@@ -1,0 +1,12 @@
+{% extends 'products/base.html' %}{% load static ui %}
+{% block extra_scripts %}<script src="{% static 'js/editor.js' %}" defer></script>{% endblock %}
+{% block products_content %}
+<h1>{% ui_icon 'products' %}{{ heading }}</h1>
+{% if product %}<p><a href="{% url 'products:detail' site.pk product.pk %}">{{ product.reference }} — {{ product.title }}</a></p>{% endif %}
+<form method="post" class="record-form" novalidate>
+{% csrf_token %}{% for field in form.hidden_fields %}{{ field }}{% endfor %}
+{% if form.errors %}<div class="form-errors" role="alert" tabindex="-1"><h2>Vérifiez votre saisie</h2>{{ form.non_field_errors }}<ul>{% for field in form %}{% if field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }} : {{ field.errors|striptags }}</a></li>{% endif %}{% endfor %}</ul><p><a href="{{ request.path }}">Recharger la fiche enregistrée</a></p></div>{% endif %}
+{% for title, fields in form_sections %}{% if fields %}<section class="panel form-panel"><h2>{{ title }}</h2><div class="form-grid">{% for field in fields %}{% include 'workspace/field.html' %}{% endfor %}</div></section>{% endif %}{% endfor %}
+<div class="form-actions"><button type="submit">{% ui_icon 'save' %}Enregistrer</button><a href="{% if product %}{% url 'products:detail' site.pk product.pk %}{% else %}{{ return_url }}{% endif %}">Annuler</a></div>
+</form>
+{% endblock %}

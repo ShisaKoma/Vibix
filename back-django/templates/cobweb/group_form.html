@@ -1,0 +1,6 @@
+{% extends 'workspace/base.html' %}
+{% load static ui %}
+{% block extra_scripts %}<script src="{% static 'js/editor.js' %}" defer></script>{% endblock %}
+{% block title %}{% if group %}Modifier le groupe{% else %}Nouveau groupe{% endif %} — Cobweb — ViBix{% endblock %}
+{% block breadcrumb %}<span aria-hidden="true">/</span><a href="{% url 'cobweb:group-list' site.pk %}{% if cobweb_function %}?function={{ cobweb_function }}{% endif %}">{% module_label "groups" %} Cobweb</a><span aria-hidden="true">/</span><span>{% if group %}Modification{% else %}Création{% endif %}</span>{% endblock %}
+{% block workspace_content %}{% include 'cobweb/record_form.html' with form=group_form record=group is_group=True %}{% endblock %}

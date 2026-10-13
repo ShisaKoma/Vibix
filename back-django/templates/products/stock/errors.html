@@ -1,0 +1,1 @@
+{% if form.errors %}<div class="form-errors" role="alert" tabindex="-1"><h2>Vérifiez votre saisie</h2>{{ form.non_field_errors }}<ul>{% for field in form %}{% if field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }} : {{ field.errors|striptags }}</a></li>{% endif %}{% endfor %}</ul></div>{% endif %}

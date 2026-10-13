@@ -1,0 +1,15 @@
+{% extends 'workspace/base.html' %}{% load ui %}
+{% block title %}Produits — {{ site.name }} — ViBix{% endblock %}
+{% block breadcrumb %}<span aria-hidden="true">/</span><a href="{{ return_url }}">Produits</a>{% endblock %}
+{% block workspace_content %}
+<nav class="form-actions" aria-label="Navigation Produits">
+  <a href="{{ return_url }}">Catalogue</a>
+  <a href="{% url 'products:all-variants' site.pk %}">Déclinaisons</a>
+  {% if can_view_stock %}<a href="{% url 'products:stock-list' site.pk %}">Stocks</a>{% endif %}
+  <a href="{% url 'products:references' site.pk 'brands' %}">Marques</a>
+  <a href="{% url 'products:references' site.pk 'definitions' %}">Caractéristiques</a>
+  {% if can_manage_settings %}<a href="{% url 'configuration:lookup-lists' site.pk 'category' %}?module=products">Catégories</a><a href="{% url 'configuration:lookup-lists' site.pk 'choice' %}?module=products">Langues</a>{% endif %}
+  <a href="{% url 'products:trash' site.pk %}">Corbeille</a>
+</nav>
+{% block products_content %}{% endblock %}
+{% endblock %}

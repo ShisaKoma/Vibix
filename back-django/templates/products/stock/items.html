@@ -1,0 +1,3 @@
+{% extends 'products/stock/base.html' %}
+{% block stock_content %}<h1>Déclinaisons suivies en stock</h1>{% if can_manage_stock %}<p><a href="{% url 'products:stock-item-create' site.pk %}">Configurer une déclinaison</a></p>{% endif %}
+<ul>{% for item in page %}<li><a href="{% url 'products:stock-item' site.pk item.pk %}">{{ item }}</a></li>{% empty %}<li>Aucune déclinaison suivie.</li>{% endfor %}</ul>{% include 'products/stock/pagination.html' %}{% endblock %}

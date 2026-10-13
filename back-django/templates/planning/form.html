@@ -1,0 +1,11 @@
+{% extends 'workspace/base.html' %}{% load ui %}
+{% block workspace_content %}
+<h1>{% ui_icon 'planning' %}{% if series %}Modifier la série{% elif event.series_id %}Modifier cette occurrence{% elif event %}Modifier {{ event.title }}{% else %}Nouvel événement{% endif %}</h1>
+<p>Les heures sont saisies dans le fuseau de l’événement. Les chevauchements sont autorisés.</p>
+{% if series %}<p class="notice">Les changements s’appliquent à toute la série, y compris aux dates passées. {{ exception_count }} exception(s) seront conservées. Réduire le nombre d’occurrences met les occurrences excédentaires non modifiées en corbeille.</p>{% elif event.series_id %}<p class="notice">Cette modification crée une exception. Les autres occurrences gardent leur horaire. <a href="{% url 'planning:series-edit' site.pk event.series_id %}">Modifier toute la série</a></p>{% endif %}
+<form method="post" class="panel">{% csrf_token %}{{ form.version }}{{ form.submission_id }}
+{% if form.errors %}<div role="alert"><h2>Vérifiez votre saisie</h2>{{ form.non_field_errors }}{% for field in form %}{% if field.errors %}<p><a href="#{{ field.id_for_label }}">{{ field.label }} : {{ field.errors|striptags }}</a></p>{% endif %}{% endfor %}</div>{% endif %}
+<div class="form-grid">{% for field in form %}{% if not field.is_hidden and field.name != 'repeat_frequency' and field.name != 'repeat_interval' and field.name != 'repeat_count' %}{% include 'workspace/field.html' %}{% endif %}{% endfor %}</div>
+{% if form.repeat_frequency %}<fieldset class="planning-recurrence"><legend>Récurrence</legend><div class="form-grid">{% include 'workspace/field.html' with field=form.repeat_frequency %}{% include 'workspace/field.html' with field=form.repeat_interval %}{% include 'workspace/field.html' with field=form.repeat_count %}</div><p>Les heures locales sont conservées au changement d’heure. Une occurrence ambiguë ou inexistante doit être corrigée avant la création de la série.</p></fieldset>{% endif %}
+<div class="form-actions"><button type="submit">{% ui_icon 'save' %}{% if series %}Enregistrer toute la série{% else %}Enregistrer l’événement{% endif %}</button><a href="{% url 'planning:calendar' site.pk %}">Annuler</a></div></form>
+{% endblock %}

@@ -1,0 +1,19 @@
+<section class="page-heading"><p class="eyebrow">{{ module === 'articles' ? 'LE JOURNAL' : 'DÉCOUVRIR' }}</p><h1>{{ module === 'articles' ? 'Nos actualités' : 'Nos pages' }}</h1><p>Explorez les rubriques et leurs contenus.</p></section>
+<div class="content-layout">
+  <nav class="rubrics" aria-label="Rubriques du module">
+    <a [routerLink]="base" [class.selected]="!selected()" [attr.aria-current]="!selected() ? 'page' : null">Toutes les rubriques</a>
+    @for (node of nodes(); track node.id) {
+      <a [routerLink]="base" [queryParams]="{category: node.id}" [class.selected]="selected() === node.id" [attr.aria-current]="selected() === node.id ? 'page' : null" [style.padding-left.rem]="1 + node.depth * 1">{{ node.label }} @if (node.field === 'group') { <small>· groupe</small> }</a>
+    }
+  </nav>
+  <section aria-label="Contenus" class="results">
+    <p class="result-count" aria-live="polite">{{ items().length }} contenu(s) · {{ selectedLabel() }}</p>
+    <div class="cards list-cards">
+      @for (item of items(); track item.id) {
+        <article class="card">@if (item.thumbnail; as image) { <img class="editorial-thumbnail" [src]="image.url" [alt]="image.altText" [width]="image.width" [height]="image.height" loading="lazy"> }<p class="eyebrow">{{ label(item.categoryId) }}</p><h2><a [routerLink]="[base, item.id]">{{ item.title }}</a></h2><p>{{ item.description }}</p><a class="read-link" [routerLink]="[base, item.id]">{{ module === 'articles' ? 'Lire l’article' : 'Voir la page' }} <span aria-hidden="true">↗</span></a></article>
+      } @empty {
+        <div class="empty"><h2>{{ unknown() ? 'Rubrique introuvable' : 'La suite s’écrit bientôt' }}</h2><p>{{ unknown() ? 'Cette rubrique ne fait pas partie de la navigation.' : 'Cette rubrique ne contient pas encore de contenu publié.' }}</p><a [routerLink]="base">Voir toutes les rubriques</a></div>
+      }
+    </div>
+  </section>
+</div>

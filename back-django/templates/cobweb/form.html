@@ -1,0 +1,6 @@
+{% extends 'workspace/base.html' %}
+{% load static ui %}
+{% block extra_scripts %}<script src="{% static 'js/editor.js' %}" defer></script>{% endblock %}
+{% block title %}{% if item %}Modifier l’entrée{% else %}Nouvelle entrée{% endif %} — Cobweb — ViBix{% endblock %}
+{% block breadcrumb %}<span aria-hidden="true">/</span><a href="{{ return_url }}">{% module_label "entries" %} Cobweb</a><span aria-hidden="true">/</span><span>{% if item %}Modification{% else %}Création{% endif %}</span>{% endblock %}
+{% block workspace_content %}{% include 'cobweb/record_form.html' with record=item %}{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'workspace/base.html' %}
+{% load static ui %}
+{% block title %}{{ section_title|default:'Fiche du carnet' }} — ViBix{% endblock %}
+{% block extra_scripts %}<script src="{% static 'js/addressbook-form.js' %}" defer></script>{% endblock %}
+{% block breadcrumb %}<span>/</span><a href="{% url 'addressbook:list' site.pk %}">Carnet d’adresses</a><span>/</span><span>{{ section_title|default:'Saisie de fiche' }}</span>{% endblock %}
+{% block workspace_content %}
+<div class="page-heading"><div><p class="eyebrow">Carnet privé</p><h1>{% ui_icon 'addressbook' %}{{ section_title|default:'Fiche du carnet' }}{% if entry %} — {{ entry }}{% endif %}</h1><p>Les informations restent accessibles aux personnes habilitées sur ce site.</p></div></div>
+{% if can_manage_types %}<p><a href="{% url 'configuration:lookup-lists' site.pk 'choice' %}?module=addressbook">Configurer les civilités, formes juridiques et autres références du carnet</a></p>{% endif %}
+<form method="post" class="record-form" data-addressbook-form novalidate>{% csrf_token %}
+{% if form.errors %}<div class="form-errors" role="alert"><h2>Vérifiez votre saisie</h2>{{ form.non_field_errors }}<ul>{% for field in form %}{% if field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }} : {{ field.errors|striptags }}</a></li>{% endif %}{% endfor %}</ul>{% if entry %}<a href="{{ request.path }}">Recharger les données enregistrées</a>{% endif %}</div>{% endif %}
+<section class="panel"><div class="form-grid">{% for field in form %}{% if field.is_hidden %}{{ field }}{% elif field.name == 'first_name' or field.name == 'gender' or field.name == 'salutation' %}<div data-addressbook-field="person">{% include 'workspace/field.html' %}</div>{% elif field.name == 'legal_form' %}<div data-addressbook-field="organization">{% include 'workspace/field.html' %}</div>{% else %}{% include 'workspace/field.html' %}{% endif %}{% endfor %}</div></section>
+<div class="form-actions"><button type="submit">{% ui_icon 'save' %}<span class="cta-label">Enregistrer</span></button>{% if entry %}<a class="secondary-button" href="{% url 'addressbook:detail' site.pk entry.pk %}">Annuler</a>{% else %}<a class="secondary-button" href="{% url 'addressbook:list' site.pk %}">Annuler</a>{% endif %}</div></form>
+{% endblock %}

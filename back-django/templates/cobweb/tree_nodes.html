@@ -1,0 +1,12 @@
+{% for node in nodes %}
+<li data-tree-node>
+  <div class="tree-row">
+    {% if node.children %}<button class="tree-toggle" type="button" aria-label="Replier {{ node.entry.label }}" tabindex="-1" data-tree-toggle hidden><span aria-hidden="true">›</span></button>{% else %}<span class="tree-spacer" aria-hidden="true"></span>{% endif %}
+    <label class="tree-node-label" for="{{ input_name }}_{{ node.entry.pk }}">
+      <input id="{{ input_name }}_{{ node.entry.pk }}" type="{% if multiple %}checkbox{% else %}radio{% endif %}" name="{{ input_name }}" value="{{ node.entry.pk }}" {% if multiple %}{% if node.id_string in selected_additional_ids %}checked{% endif %}{% else %}{% if not optional %}required{% endif %} {% if selected_category_id == node.id_string %}checked{% endif %}{% endif %}>
+      <span class="tree-indicator" aria-hidden="true"></span><span id="{{ input_name }}_{{ node.entry.pk }}_label" data-tree-label>{{ node.entry.label }}</span>
+    </label>
+  </div>
+  {% if node.children %}<ul class="tree-children">{% include 'cobweb/tree_nodes.html' with nodes=node.children %}</ul>{% endif %}
+</li>
+{% empty %}<li class="muted">Aucune catégorie disponible.</li>{% endfor %}

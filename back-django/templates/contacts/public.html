@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Contact — {{ site.name }} — ViBix{% endblock %}
+{% block content %}
+<section class="panel contact-public">
+  <h1>{% if schema %}{{ schema.label }} — {% endif %}{{ site.name }}</h1>
+  {% if accepted %}
+    <p role="status">Votre demande a été reçue. Merci de nous avoir écrit.</p>
+    <a href="{% url 'contacts:public-form' site.pk %}?type={{ schema.code|urlencode }}">Envoyer une autre demande</a>
+  {% else %}
+    <p>Les champs marqués d’un astérisque sont requis. Vos informations servent au traitement de votre demande et ont une durée de conservation prévue de {{ retention_days }} jours dans ce module.</p>
+    <nav aria-label="Autres formulaires"><ul>{% for item in available_forms %}<li><a href="{% url 'contacts:public-form' site.pk %}?type={{ item.code|urlencode }}">{{ item.label }}</a></li>{% endfor %}</ul></nav>
+    <form method="post">
+      {% csrf_token %}{{ form.non_field_errors }}
+      {% for field in form %}{% if field.is_hidden %}{{ field }}{{ field.errors }}{% else %}{% include 'workspace/field.html' %}{% endif %}{% endfor %}
+      <div class="form-actions"><button type="submit">Envoyer la demande</button></div>
+    </form>
+  {% endif %}
+</section>
+{% endblock %}

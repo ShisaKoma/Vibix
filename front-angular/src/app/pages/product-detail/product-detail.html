@@ -1,0 +1,45 @@
+<nav class="product-pagination" aria-label="Retour au catalogue"><a routerLink="/products" [queryParams]="backQuery()">← Retour aux produits</a></nav>
+@if (loading()) { <p class="empty" role="status">Chargement du produit…</p> }
+@else if (error()) { <section class="empty"><h1>Produit indisponible</h1><p role="alert">{{ error() }}</p><button type="button" (click)="load()">Relire la fiche</button></section> }
+@else if (item(); as product) {
+  <article class="product-detail"><header class="page-heading"><p class="eyebrow">{{ product.category_label }}</p><h1 id="product-title" tabindex="-1">{{ product.title }}</h1><p>{{ product.subtitle }}</p><p>{{ product.reference }}@if (product.brand) { · {{ product.brand.name }} }</p></header>
+    @if (product.picture; as image) { <img class="product-main-image" [src]="image.url" [alt]="image.alt_text" [width]="image.width" [height]="image.height"> }
+    <p class="product-summary">{{ product.summary }}</p><div class="rich-content" [innerHTML]="product.content_html"></div>
+    @if (gallery(); as images) { @if (images.count) {
+      <section class="product-section"><h2>Galerie</h2><div class="product-gallery">@for (image of images.results; track image.id) { <figure><img [src]="image.asset.url" [alt]="image.asset.alt_text" [width]="image.asset.width" [height]="image.asset.height" loading="lazy"></figure> }</div>
+        @if (images.pages > 1) { <nav class="product-pagination" aria-label="Pages de la galerie"><span>Page {{ images.page }} / {{ images.pages }}</span><button type="button" [disabled]="busy() || images.page === 1" (click)="loadGallery(images.page - 1)">Précédente</button><button type="button" [disabled]="busy() || images.page === images.pages" (click)="loadGallery(images.page + 1)">Suivante</button></nav> }
+      </section>
+    } }
+    @if (variants(); as offers) { @if (offers.count) {
+      <section class="product-section"><h2>Déclinaisons</h2><ul class="product-variants">@for (variant of offers.results; track variant.id) { <li><button type="button" (click)="selectVariant(variant.id)" [attr.aria-pressed]="selected()?.id === variant.id">{{ variant.title }} <span class="product-reference">{{ variant.reference }}</span></button></li> }</ul>
+        @if (offers.pages > 1) { <nav class="product-pagination" aria-label="Pages des déclinaisons"><span>Page {{ offers.page }} / {{ offers.pages }}</span><button type="button" [disabled]="busy() || offers.page === 1" (click)="loadVariants(offers.page - 1)">Précédente</button><button type="button" [disabled]="busy() || offers.page === offers.pages" (click)="loadVariants(offers.page + 1)">Suivante</button></nav> }
+      </section>
+    } }
+    @if (selected(); as variant) {
+      <section class="product-section" aria-labelledby="variant-title"><h2 id="variant-title" tabindex="-1">{{ variant.title }}</h2><p>{{ variant.reference }}</p><button type="button" (click)="selectVariant(null)">Revenir à la fiche produit</button>
+        @if (variant.picture; as image) { <img class="product-main-image" [src]="image.url" [alt]="image.alt_text" [width]="image.width" [height]="image.height" loading="lazy"> }
+        @if (!variant.content_inherited) { <div class="rich-content" [innerHTML]="variant.content_html"></div> }
+        @if (features(); as values) { @if (values.count) { <h3>Caractéristiques</h3><dl class="product-properties">@for (feature of values.results; track feature.id) { <dt>{{ feature.label }}</dt><dd>{{ featureLabel(feature) }} {{ feature.unit }}</dd> }</dl>
+          @if (values.pages > 1) { <nav class="product-pagination" aria-label="Pages des caractéristiques"><span>Page {{ values.page }} / {{ values.pages }}</span><button type="button" [disabled]="busy() || values.page === 1" (click)="loadFeatures(values.page - 1)">Précédente</button><button type="button" [disabled]="busy() || values.page === values.pages" (click)="loadFeatures(values.page + 1)">Suivante</button></nav> }
+        } }
+        @if (tariffs(); as prices) { @if (prices.count) { <h3>Tarifs</h3>
+          <div class="product-tariffs">@for (tariff of prices.results; track tariff.id) { <article class="panel"><h4>{{ tariff.label }}</h4>
+            @if (tariff.on_request) { <p>Prix sur demande</p> } @else { <p class="product-price">{{ tariff.amount }} {{ tariff.currency }} {{ tariff.basis }}</p>
+              @if (tariff.promotion) { <p>Promotion — prix normal : {{ tariff.normal_amount }} {{ tariff.currency }} {{ tariff.basis }}</p> }
+              <dl class="product-properties">@if (tariff.amounts.net !== null) { <dt>Montant HT</dt><dd>{{ tariff.amounts.net }} {{ tariff.currency }}</dd> }@if (tariff.amounts.gross !== null) { <dt>Montant TTC</dt><dd>{{ tariff.amounts.gross }} {{ tariff.currency }}</dd> }@if (tariff.tax_rate !== null) { <dt>Taxe</dt><dd>{{ tariff.tax_rate }} %</dd> }@if (tariff.unit_amount !== null) { <dt>Prix par unité</dt><dd>{{ tariff.unit_amount }} {{ tariff.currency }} {{ tariff.basis }}</dd> }</dl>
+            }
+            <p>Conditionnement : {{ tariff.quantity }} {{ tariff.unit }}</p>@if (tariff.terms) { <p class="product-terms">{{ tariff.terms }}</p> }
+          </article> }</div>
+          @if (prices.pages > 1) { <nav class="product-pagination" aria-label="Pages des tarifs"><span>Page {{ prices.page }} / {{ prices.pages }}</span><button type="button" [disabled]="busy() || prices.page === 1" (click)="loadTariffs(prices.page - 1)">Précédente</button><button type="button" [disabled]="busy() || prices.page === prices.pages" (click)="loadTariffs(prices.page + 1)">Suivante</button></nav> }
+        } }
+        <dl class="product-properties">@if (variant.dimensions.length !== null) { <dt>Longueur</dt><dd>{{ variant.dimensions.length }} {{ variant.dimensions.dimension_unit }}</dd> }@if (variant.dimensions.width !== null) { <dt>Largeur</dt><dd>{{ variant.dimensions.width }} {{ variant.dimensions.dimension_unit }}</dd> }@if (variant.dimensions.height !== null) { <dt>Hauteur</dt><dd>{{ variant.dimensions.height }} {{ variant.dimensions.dimension_unit }}</dd> }@if (variant.dimensions.weight !== null) { <dt>Poids</dt><dd>{{ variant.dimensions.weight }} {{ variant.dimensions.weight_unit }}</dd> }</dl>
+        @if (variantGallery(); as images) { @if (images.count) { <h3>Galerie de cette déclinaison</h3><div class="product-gallery">@for (image of images.results; track image.id) { <figure><img [src]="image.asset.url" [alt]="image.asset.alt_text" [width]="image.asset.width" [height]="image.asset.height" loading="lazy"></figure> }</div>
+          @if (images.pages > 1) { <nav class="product-pagination" aria-label="Pages de la galerie de déclinaison"><span>Page {{ images.page }} / {{ images.pages }}</span><button type="button" [disabled]="busy() || images.page === 1" (click)="loadVariantGallery(images.page - 1)">Précédente</button><button type="button" [disabled]="busy() || images.page === images.pages" (click)="loadVariantGallery(images.page + 1)">Suivante</button></nav> }
+        } }
+      </section>
+    }
+    @if (busy()) { <p role="status">Chargement de la collection…</p> }@if (collectionError()) { <p role="alert">{{ collectionError() }}</p> }
+    @if (product.terms) { <section class="product-section"><h2>Conditions</h2><p class="product-terms">{{ product.terms }}</p></section> }
+    @if (product.reservable) { <section class="product-section"><h2>Réservation</h2><p>Les réservations de cette offre sont gérées en interne par les gestionnaires du site.</p></section> }
+  </article>
+}

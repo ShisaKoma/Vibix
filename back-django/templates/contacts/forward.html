@@ -1,0 +1,18 @@
+{% extends 'workspace/base.html' %}{% load ui %}
+{% block title %}Retransmettre une demande — {{ site.name }}{% endblock %}
+{% block workspace_content %}
+<h1>{% ui_icon 'contacts' %}{% if job %}Relancer la retransmission{% else %}Retransmettre par email{% endif %}</h1>
+<p>{{ contact.title }}</p>
+<section class="panel"><h2>Contenu retransmis</h2>
+<p>Le message reçu et les coordonnées seront envoyés en texte simple. Les notes internes restent dans le back-office.</p>
+{% if job %}<p><strong>Destinataire : {{ job.recipient }}</strong></p>{% endif %}
+<p><strong>Objet de l’email : Demande de contact retransmise</strong></p>
+<pre class="contact-message">{{ preview }}</pre>
+</section>
+<section class="panel"><h2>{% if job %}Confirmer la relance{% else %}Préparer l’envoi{% endif %}</h2>
+<form method="post">{% csrf_token %}{{ form.non_field_errors }}
+{% for field in form %}{% if field.is_hidden %}{{ field }}{{ field.errors }}{% else %}{% include 'workspace/field.html' %}{% endif %}{% endfor %}
+<p class="muted">L’envoi passe par le serveur SMTP du site. Son état sera visible dans l’historique de la demande.</p>
+<div class="form-actions"><button type="submit">{% if job %}Relancer l’envoi{% else %}Retransmettre{% endif %}</button><a href="{% url 'contacts:detail' site.pk contact.pk %}">Annuler</a></div>
+</form></section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Connexion — ViBix{% endblock %}
+{% block content %}
+<section class="panel login">
+  <h1>Connexion</h1>
+  <p>Accédez à vos sites et à votre espace de gestion.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_div }}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <button type="submit">Se connecter</button>
+  </form>
+</section>
+{% endblock %}

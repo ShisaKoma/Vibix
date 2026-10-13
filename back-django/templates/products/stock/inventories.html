@@ -1,0 +1,3 @@
+{% extends 'products/stock/base.html' %}
+{% block stock_content %}<h1>Inventaires</h1>{% if can_manage_stock_inventory %}<p><a href="{% url 'products:stock-inventory-create' site.pk %}">Ouvrir un inventaire</a></p>{% endif %}
+<ul>{% for row in page %}<li><a href="{% url 'products:stock-inventory' site.pk row.pk %}">{{ row.location }} — {{ row.reference }}</a> · {{ row.get_state_display }} · {{ row.created_at }}</li>{% empty %}<li>Aucun inventaire.</li>{% endfor %}</ul>{% include 'products/stock/pagination.html' %}{% endblock %}

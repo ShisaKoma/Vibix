@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+.venv
+__pycache__
+*.pyc
+.ruff_cache
+staticfiles
+media
+*.dump
+node_modules
+frontend/node_modules
+frontend/test-results
+frontend/playwright-report

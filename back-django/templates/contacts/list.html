@@ -1,0 +1,14 @@
+{% extends 'workspace/base.html' %}
+{% load ui %}
+{% block title %}Contacts — {{ site.name }} — ViBix{% endblock %}
+{% block breadcrumb %}<span aria-hidden="true">/</span><span>Contacts</span>{% endblock %}
+{% block workspace_content %}
+<h1>{% module_label 'contacts' %}</h1>
+<p class="muted">Demandes reçues, traitement et liaison au carnet de {{ site.name }}.</p>
+<p><a href="{% url 'contacts:public-form' site.pk %}">Ouvrir le formulaire public</a>{% if can_manage_clients %} · <a href="{% url 'contacts:clients' site.pk %}">Clients API</a>{% endif %}</p>
+<section class="panel"><h2>Rechercher une demande</h2>
+<form method="get"><div class="form-grid">{% for field in search_form %}{% include 'workspace/field.html' %}{% endfor %}</div><div class="form-actions"><button type="submit">{% ui_icon 'search' %}<span class="cta-label">Rechercher</span></button><a href="{% url 'contacts:list' site.pk %}">Réinitialiser</a></div></form></section>
+<section class="panel"><h2>{{ page.paginator.count }} demande{{ page.paginator.count|pluralize }}</h2>
+{% if page.object_list %}<div class="table-scroll" tabindex="0" role="region" aria-label="Demandes de contact"><table><caption class="visually-hidden">Contacts privés de {{ site.name }}</caption><thead><tr><th scope="col">Objet</th><th scope="col">Personne</th><th scope="col">Formulaire</th><th scope="col">Catégorie</th><th scope="col">Statut</th><th scope="col">Reçue le</th></tr></thead><tbody>{% for contact in page %}<tr><td><a href="{% url 'contacts:detail' site.pk contact.pk %}">{{ contact.title }}</a></td><td>{{ contact.name }} {{ contact.first_name }}</td><td>{{ contact.form_snapshot.label|default:'Historique sans type' }}</td><td>{{ contact.category.label|default:'Sans catégorie' }}</td><td>{{ contact.get_status_display }}</td><td>{{ contact.created_at|date:'d/m/Y H:i' }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="notice">Aucune demande trouvée.</p>{% endif %}
+{% if page.has_other_pages %}<nav class="pagination" aria-label="Pagination">{% if page.has_previous %}<a href="?{{ page_query }}&amp;page={{ page.previous_page_number }}">Précédent</a>{% endif %}<span>Page {{ page.number }} sur {{ page.paginator.num_pages }}</span>{% if page.has_next %}<a href="?{{ page_query }}&amp;page={{ page.next_page_number }}">Suivant</a>{% endif %}</nav>{% endif %}</section>
+{% endblock %}

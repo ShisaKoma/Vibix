@@ -1,0 +1,3 @@
+{% extends 'workspace/base.html' %}
+{% block title %}{{ action_label }} — Contacts — ViBix{% endblock %}
+{% block workspace_content %}<h1>{{ action_label }}</h1><section class="panel"><p>{{ contact.title }}{{ client.name }}</p><form method="post">{% csrf_token %}{{ form.non_field_errors }}{{ form.version }}{% include 'workspace/field.html' with field=form.confirm %}<div class="form-actions"><button type="submit">{{ action_label }}</button><a href="{% url 'contacts:list' site.pk %}">Annuler</a></div></form></section>{% endblock %}

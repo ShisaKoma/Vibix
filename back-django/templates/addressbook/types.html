@@ -1,0 +1,9 @@
+{% extends 'workspace/base.html' %}
+{% load ui %}
+{% block title %}Types de fiche — Carnet — ViBix{% endblock %}
+{% block breadcrumb %}<span>/</span><a href="{% url 'addressbook:list' site.pk %}">Carnet d’adresses</a><span>/</span><span>Types de fiche</span>{% endblock %}
+{% block workspace_content %}
+<div class="page-heading"><div><p class="eyebrow">Carnet privé</p><h1>{% ui_icon 'addressbook' %}Types de fiche</h1><p>Chaque type appartient à une famille stable. Son code sert de clé aux futurs imports.</p></div><a class="secondary-button" href="{% url 'addressbook:type-create' site.pk %}">{% ui_icon 'add' %}<span class="cta-label">Ajouter un type</span></a></div>
+<section class="panel"><h2>Types du site</h2><div class="table-scroll" tabindex="0" role="region" aria-label="Types de fiche"><table><thead><tr><th scope="col">Famille</th><th scope="col">Type</th><th scope="col">Code stable</th><th scope="col">État</th><th scope="col">Action</th></tr></thead><tbody>{% for item in types %}<tr><td>{{ item.get_kind_display }}</td><td>{{ item.label }}</td><td><code>{{ item.code }}</code></td><td>{% if item.is_active %}Actif{% else %}Inactif{% endif %}</td><td><a href="{% url 'addressbook:type-edit' site.pk item.pk %}">Modifier</a></td></tr>{% empty %}<tr><td colspan="5">Aucun type configuré.</td></tr>{% endfor %}</tbody></table></div></section>
+<p><a href="{% url 'configuration:lookup-lists' site.pk 'choice' %}">Configurer les genres, civilités, formes juridiques, origines et fonctions</a> · <a href="{% url 'configuration:lookup-lists' site.pk 'category' %}">Configurer les catégories</a></p>
+{% endblock %}

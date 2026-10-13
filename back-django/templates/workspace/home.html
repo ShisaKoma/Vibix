@@ -1,0 +1,47 @@
+{% extends 'workspace/base.html' %}
+{% load ui %}
+{% block title %}{{ site.name }} — ViBix{% endblock %}
+{% block workspace_content %}
+<p class="eyebrow">Espace de travail</p>
+<h1>{% module_label "overview" %}</h1>
+<p class="muted">Accédez aux modules de {{ site.name }}.</p>
+<div aria-label="Modules disponibles">
+  {% if can_view_products and site.pk != 1 %}<section class="workspace-module-group"><h2>Catalogue</h2><div class="workspace-tiles"><a class="module-tile" href="{% url 'products:list' site.pk %}"><span class="module-tile-title">{% module_label "products" %}</span><span class="module-tile-meta">{{ module_counts.products }} produit{{ module_counts.products|pluralize }}</span></a></div></section>{% endif %}
+  {% if can_view_planning and site.pk != 1 %}<section class="workspace-module-group"><h2>Événements</h2><div class="workspace-tiles"><a class="module-tile" href="{% url 'planning:calendar' site.pk %}"><span class="module-tile-title">{% module_label "planning" %}</span><span class="module-tile-meta">{{ module_counts.planning }} événement{{ module_counts.planning|pluralize }}</span></a></div></section>{% endif %}
+  {% if can_view_bookings and site.pk != 1 %}<section class="workspace-module-group"><h2>Réservations internes</h2><div class="workspace-tiles"><a class="module-tile" href="{% url 'planning:booking-list' site.pk %}"><span class="module-tile-title">Réservations</span><span class="module-tile-meta">{{ module_counts.bookings }} réservation{{ module_counts.bookings|pluralize }}</span></a></div></section>{% endif %}
+  {% if can_view_contacts and site.pk != 1 %}<section class="workspace-module-group"><h2>Demandes</h2><div class="workspace-tiles"><a class="module-tile" href="{% url 'contacts:list' site.pk %}"><span class="module-tile-title">{% module_label 'contacts' %} →</span><span class="module-tile-meta">{{ module_counts.contacts }} demande{{ module_counts.contacts|pluralize }}</span></a></div></section>{% endif %}
+  {% if can_view_addressbook and site.pk != 1 %}<section class="workspace-module-group"><h2>Relations</h2><div class="workspace-tiles"><a class="module-tile" href="{% url 'addressbook:list' site.pk %}"><span class="module-tile-title">{% module_label "addressbook" %} <span aria-hidden="true">→</span></span><span class="module-tile-meta">{{ module_counts.addressbook }} fiche{{ module_counts.addressbook|pluralize }}</span></a></div></section>{% endif %}
+  {% if can_view_pages or can_view_articles %}<section class="workspace-module-group"><h2>Contenus éditoriaux</h2><div class="workspace-tiles">
+  {% if can_view_pages %}
+  <a class="module-tile" href="{% url 'pages:list' site.pk %}"><span class="module-tile-title">{% module_label "pages" %} <span aria-hidden="true">→</span></span><span class="module-tile-meta">{{ module_counts.pages }} page{{ module_counts.pages|pluralize }}</span></a>
+  {% endif %}
+  {% if can_view_articles %}
+  <a class="module-tile" href="{% url 'articles:list' site.pk %}"><span class="module-tile-title">{% module_label "articles" %} <span aria-hidden="true">→</span></span><span class="module-tile-meta">{{ module_counts.articles }} article{{ module_counts.articles|pluralize }}</span></a>
+  {% endif %}
+  </div></section>{% endif %}
+  {% if can_view_cobweb or can_view_groups %}<section class="workspace-module-group"><h2>Contenus Cobweb</h2><div class="workspace-tiles">
+  <div class="module-tile">
+    <span class="module-tile-title">{% module_label "cobweb" %}</span>
+    <div class="module-tile-links">
+      {% if can_view_cobweb %}{% cobweb_functions "tiles" %}{% endif %}
+      {% if can_view_groups %}<a href="{% url 'cobweb:slideshow-list' site.pk %}">{% module_label "slideshow" %} <span class="module-count">{{ module_counts.slideshow }}</span></a>{% endif %}
+      {% if can_view_cobweb %}<a href="{% url 'cobweb:list' site.pk %}">{% module_label "entries" %} <span class="module-count">{{ module_counts.cobweb }}</span></a>{% endif %}
+      {% if can_view_groups %}<a href="{% url 'cobweb:group-list' site.pk %}">{% module_label "groups" %} <span class="module-count">{{ module_counts.groups }}</span></a>{% endif %}
+    </div>
+  </div>
+  </div></section>{% endif %}
+  {% if can_view_media %}
+  <section class="workspace-module-group"><h2>Médiathèque</h2><div class="workspace-tiles">
+  <a class="module-tile" href="{% url 'media:list' site.pk %}"><span class="module-tile-title">{% module_label "media" %} <span aria-hidden="true">→</span></span><span class="module-tile-meta">{{ module_counts.media }} média{{ module_counts.media|pluralize }}</span></a>
+  </div></section>
+  {% endif %}
+  {% if can_manage_settings %}
+  <section class="workspace-module-group"><h2>Configuration</h2><div class="workspace-tiles">
+  <a class="module-tile" href="{% url 'configuration:site-settings' site.pk %}"><span class="module-tile-title">{% module_label "settings" %} <span aria-hidden="true">→</span></span><span class="module-tile-meta">Catégories et listes déroulantes</span></a>
+  </div></section>
+  {% endif %}
+</div>
+{% if not can_view_bookings and not can_view_products and not can_view_planning and not can_view_contacts and not can_view_addressbook and not can_view_pages and not can_view_articles and not can_view_cobweb and not can_view_groups and not can_view_media and not can_manage_settings %}
+<p class="notice">Aucun module accessible pour ce site. Contactez votre administrateur pour obtenir un accès.</p>
+{% endif %}
+{% endblock %}

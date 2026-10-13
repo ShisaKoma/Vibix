@@ -1,0 +1,9 @@
+{% extends 'planning/bookings/base.html' %}{% load tz %}
+{% block booking_content %}
+<h1>Réservation {{ booking.reference }}</h1><p>{{ booking.get_state_display }} — version {{ booking.version }}</p><p>{% timezone quote.timezone %}{{ display_start|date:'d/m/Y H:i O' }} — {{ display_end|date:'d/m/Y H:i O' }}{% endtimezone %} dans {{ quote.timezone }}</p>
+{% include 'planning/bookings/quote.html' %}
+{% if can_personal %}<section class="panel"><h2>Coordonnées privées</h2><dl><dt>Nom</dt><dd>{{ booking.name }}</dd><dt>Courriel</dt><dd>{{ booking.email|default:'Non renseigné' }}</dd><dt>Téléphone</dt><dd>{{ booking.phone|default:'Non renseigné' }}</dd></dl></section>{% endif %}
+<div class="form-actions">{% for action in actions %}<a href="{% url 'planning:booking-action' site.pk booking.pk action.key %}">{{ action.label }}</a>{% endfor %}</div>
+<section class="panel"><h2>Historique — 100 dernières opérations</h2><ul>{% for item in history %}<li>{{ item.created_at }} — {{ item.action }} — {{ item.actor }}{% if item.reason %} : {{ item.reason }}{% endif %}<p>{{ item.details.state }} · {{ item.details.starts_at }} → {{ item.details.ends_at }}{% if item.details.previous %} (auparavant : {{ item.details.previous.state }} · {{ item.details.previous.starts_at }} → {{ item.details.previous.ends_at }}){% endif %}</p></li>{% endfor %}</ul></section>
+<section class="panel"><h2>Notifications internes — 100 dernières</h2><p>Le worker Réservations doit être lancé séparément. Un échec SMTP ne change jamais l'état de la réservation.</p><ul>{% for job in notifications %}<li>Version {{ job.event_version }} — {{ job.get_state_display }} — {{ job.attempts }} tentative(s){% if can_retry and job.state == 'failed' %} — <a href="{% url 'planning:booking-retry' site.pk booking.pk job.pk %}">Relancer</a>{% endif %}</li>{% endfor %}</ul></section>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "workspace/base.html" %}
+{% load ui %}
+{% block title %}{{ kind_label }} — {{ site.name }} — ViBix{% endblock %}
+{% block breadcrumb %}<span aria-hidden="true">/</span><a href="{% url 'configuration:site-settings' site.pk %}">{% module_label "settings" %}</a><span aria-hidden="true">/</span><span>{% if kind_label %}{{ kind_label }}{% else %}{{ item.name }}{% endif %}</span>{% endblock %}
+{% block workspace_content %}
+
+<h1>{% ui_icon "settings" %}{{ kind_label }} par module</h1>
+<p>Chaque liste doit alimenter un champ métier précis. Son code reste stable pour les imports et l’API.</p>
+<nav aria-label="Filtrer les référentiels par module" class="reference-module-filter">
+  <a href="{% url 'configuration:lookup-lists' site.pk kind %}"{% if not module %} aria-current="page"{% endif %}>Tous</a>
+  {% for code, label in module_filters %}<a href="{% url 'configuration:lookup-lists' site.pk kind %}?module={{ code }}"{% if module == code %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+</nav>
+{% if module == 'cobweb' and kind == 'category' %}<p class="notice">Les catégories racines <code>medias</code>, <code>advertisements</code>, <code>partners</code> et <code>sitemap</code> pilotent les raccourcis Cobweb. Si plusieurs listes contiennent une même racine, désactivez-la dans chaque liste pour masquer sa fonction ; ses entrées restent enregistrées.</p>{% endif %}
+<div class="grid">
+  <section class="panel">
+    <h2>Créer une liste</h2>
+    <form method="post">{% csrf_token %}{{ form.as_div }}<button type="submit">{% ui_icon "add" %}<span class="cta-label">Créer la liste</span></button></form>
+  </section>
+  <section class="panel">
+    <h2>Listes existantes</h2>
+    {% for item in lists %}
+      <article class="reference-row">
+        <h3>{{ item.name }} <span class="muted">— {{ item.get_module_display }}</span></h3>
+        <p><strong>{{ item.get_field_key_display }}</strong><br><code>{{ item.code }}</code>{% if not item.is_active %} · inactive{% endif %} · {{ item.entries.count }} valeur(s)</p>
+        <a href="{% url 'configuration:lookup-edit' site.pk item.pk %}">Modifier cette liste et ses valeurs</a>
+      </article>
+    {% empty %}<p>Aucune liste configurée.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

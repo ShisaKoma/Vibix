@@ -1,0 +1,13 @@
+{% extends 'products/stock/base.html' %}
+{% block stock_content %}
+<h1>{{ heading }}</h1>
+{% if item %}<p>{{ item }}</p>{% endif %}
+{% if inventory %}<p>Inventaire {{ inventory.reference }} — {{ inventory.get_state_display }}</p>{% endif %}
+{% if consequences %}<p>{{ consequences }}</p>{% endif %}
+<form method="post" class="record-form" novalidate>{% csrf_token %}
+{% include 'products/stock/errors.html' %}
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+<section class="panel"><div class="form-grid">{% for field in form.visible_fields %}{% include 'workspace/field.html' %}{% endfor %}</div></section>
+<div class="form-actions"><button type="submit">Enregistrer</button><a href="{{ request.get_full_path }}">Recharger</a>{% if inventory %}<a href="{% url 'products:stock-inventory' site.pk inventory.pk %}">Revenir à l'inventaire</a>{% elif item %}<a href="{% url 'products:stock-item' site.pk item.pk %}">Revenir au stock</a>{% else %}<a href="{% url 'products:stock-list' site.pk %}">Revenir aux stocks</a>{% endif %}</div>
+</form>
+{% endblock %}

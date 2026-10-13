@@ -1,0 +1,7 @@
+{% extends 'products/base.html' %}{% load ui %}
+{% block products_content %}
+<h1>{% ui_icon 'products' %}Déclinaisons{% if product %} — {{ product.title }}{% endif %}</h1>
+{% if product and can_change %}<a href="{% url 'products:variant-create' site.pk product.pk %}">Ajouter une déclinaison</a>{% endif %}
+<form method="get" class="panel"><label for="variant-search">Référence, titre ou produit</label><input id="variant-search" name="q" value="{{ q }}" maxlength="200"><button type="submit">Rechercher</button></form>
+<div class="table-scroll"><table><caption>Déclinaisons courantes et archivées</caption><thead><tr><th scope="col">Produit</th><th scope="col">Référence</th><th scope="col">Titre</th><th scope="col">État</th><th scope="col">Actions</th></tr></thead><tbody>{% for variant in page %}<tr><td><a href="{% url 'products:detail' site.pk variant.product_id %}">{{ variant.product.title }}</a></td><td>{{ variant.reference }}</td><td><a href="{% url 'products:variant-detail' site.pk variant.product_id variant.pk %}">{{ variant.title }}</a></td><td>{% if variant.archived_at %}Archivée{% elif variant.is_active %}Active{% else %}Inactive{% endif %}</td><td>{% if can_change %}<a href="{% url 'products:variant-archive' site.pk variant.product_id variant.pk %}">{% if variant.archived_at %}Restaurer{% else %}Archiver{% endif %} {{ variant.reference }}</a>{% endif %}</td></tr>{% empty %}<tr><td colspan="5">Aucune déclinaison.</td></tr>{% endfor %}</tbody></table></div>{% include 'products/pagination.html' %}
+{% endblock %}

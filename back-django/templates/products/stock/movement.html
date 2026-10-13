@@ -1,0 +1,6 @@
+{% extends 'products/stock/base.html' %}
+{% block stock_content %}<h1>{{ heading }}</h1>
+<form method="get" class="panel"><h2>Choisir les stocks</h2>{{ selection.non_field_errors }}<div class="form-grid">{% for field in selection %}{% include 'workspace/field.html' %}{% endfor %}</div><button type="submit">Préparer le mouvement</button></form>
+{% if form %}<section class="panel"><h2>Récapitulatif</h2><p>{{ item }}</p>{% if source %}<p>Départ : {{ source.location }} — {{ source.quantity }} {{ item.unit }}</p>{% endif %}{% if destination %}<p>Arrivée : {{ destination.location }} — {{ destination.quantity }} {{ item.unit }}</p>{% endif %}<p>Le mouvement sera enregistré immédiatement après confirmation. Un transfert retire et ajoute la même quantité dans une seule opération.</p>
+<form method="post" novalidate>{% csrf_token %}{% include 'products/stock/errors.html' %}{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}<div class="form-grid">{% for field in form.visible_fields %}{% include 'workspace/field.html' %}{% endfor %}</div><div class="form-actions"><button type="submit">Enregistrer le mouvement</button><a href="{{ request.get_full_path }}">Recharger le récapitulatif</a></div></form></section>{% endif %}
+{% endblock %}

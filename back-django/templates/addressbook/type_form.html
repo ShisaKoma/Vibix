@@ -1,0 +1,9 @@
+{% extends 'workspace/base.html' %}
+{% load ui %}
+{% block title %}Type de fiche — Carnet — ViBix{% endblock %}
+{% block breadcrumb %}<span>/</span><a href="{% url 'addressbook:list' site.pk %}">Carnet d’adresses</a><span>/</span><a href="{% url 'addressbook:types' site.pk %}">Types de fiche</a><span>/</span><span>{% if entry_type %}Modification{% else %}Création{% endif %}</span>{% endblock %}
+{% block workspace_content %}
+<h1>{% ui_icon 'addressbook' %}{% if entry_type %}Modifier {{ entry_type.label }}{% else %}Nouveau type de fiche{% endif %}</h1>
+<p>La famille et le code restent stables après création. Désactiver un type empêche son attribution aux nouvelles fiches sans perdre les fiches existantes.</p>
+<form method="post" class="record-form" novalidate>{% csrf_token %}{% if form.errors %}<div class="form-errors" role="alert"><h2>Vérifiez votre saisie</h2>{{ form.non_field_errors }}</div>{% endif %}<section class="panel"><div class="form-grid">{% for field in form %}{% include 'workspace/field.html' %}{% endfor %}</div></section><div class="form-actions"><button type="submit">{% ui_icon 'save' %}<span class="cta-label">Enregistrer</span></button><a href="{% url 'addressbook:types' site.pk %}">Annuler</a></div></form>
+{% endblock %}

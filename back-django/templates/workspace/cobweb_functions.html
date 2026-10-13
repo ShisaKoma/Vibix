@@ -1,0 +1,1 @@
+{% for function in functions %}<a href="{% url 'cobweb:function-list' site.pk function.code %}"{% if variant == 'sidebar' and active_function == function.code %} aria-current="page"{% endif %}><span class="module-label">{% include 'workspace/icon.html' with icon=function.icon %}<span>{{ function.label }}</span></span></a>{% endfor %}

@@ -1,0 +1,17 @@
+{% extends 'workspace/base.html' %}
+{% block title %}Formulaires Contacts — {{ site.name }}{% endblock %}
+{% block workspace_content %}
+<h1>Formulaires Contacts</h1>
+<p><a href="{% url 'configuration:site-settings' site.pk %}">Paramètres du site</a> · <a href="{% url 'contacts:definitions' site.pk %}">Tous les formulaires</a></p>
+{% if editing %}
+<form method="post" class="panel">{% csrf_token %}{{ form.non_field_errors }}{{ form.version }}{{ form.version.errors }}
+{% include 'workspace/field.html' with field=form.code %}{% include 'workspace/field.html' with field=form.label %}{% include 'workspace/field.html' with field=form.is_active %}{% include 'workspace/field.html' with field=form.position %}
+<p>Le code identifie le type de demande et reste fixe après création. Les coordonnées et le message sont communs à tous les formulaires. Désactiver une question conserve son paramétrage et les réponses déjà reçues.</p>
+{% for row in form.question_rows %}<fieldset><legend>Question {{ row.number }}</legend>{% for field in row.fields %}{% include 'workspace/field.html' %}{% endfor %}</fieldset>{% endfor %}
+<button type="submit">Enregistrer le formulaire</button></form>
+{% else %}
+<p><a href="{% url 'contacts:definition-create' site.pk %}">Créer un type de formulaire</a></p>
+<p>Les libellés des questions sont conservés avec chaque demande reçue. L’activation de Contacts et de l’accès public reste nécessaire pour ouvrir ces formulaires aux visiteurs.</p>
+{% for definition in definitions %}<section class="panel"><h2>{{ definition.label }}</h2><p>{{ definition.code }} · {% if definition.is_active %}Actif{% else %}Inactif{% endif %} · {{ definition.questions|length }} question(s) complémentaire(s)</p><p><a href="{% url 'contacts:definition-edit' site.pk definition.pk %}">Configurer</a>{% if definition.is_active %} · <a href="{% url 'contacts:public-form' site.pk %}?type={{ definition.code|urlencode }}">Ouvrir le formulaire public</a>{% endif %}</p></section>{% empty %}<p>Aucun type configuré. Le formulaire standard reste disponible jusqu’à l’initialisation des types du site.</p>{% endfor %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Connexion temporairement limitée — ViBix{% endblock %}
+{% block content %}
+<section class="panel login">
+  <h1>Connexion temporairement limitée</h1>
+  <p>Le nombre de tentatives a été dépassé. Réessayez dans 15 minutes.</p>
+  <a href="{% url 'login' %}">Retour à la connexion</a>
+</section>
+{% endblock %}

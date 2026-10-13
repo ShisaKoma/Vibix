@@ -1,0 +1,8 @@
+{% extends 'planning/bookings/base.html' %}
+{% block booking_content %}
+<h1>{{ heading }}</h1>{% if booking %}<p>Réservation {{ booking.reference }} — {{ booking.get_state_display }}</p>{% endif %}
+{% include 'planning/bookings/quote.html' %}
+{% if unavailable %}<p role="alert">Cette offre n'accepte plus de nouvelles demandes.</p>{% endif %}
+<section class="panel"><form method="post">{% csrf_token %}{% for hidden in form.hidden_fields %}{{ hidden }}{% if hidden.errors %}<p role="alert">{{ hidden.errors }}</p>{% endif %}{% endfor %}{{ form.non_field_errors }}<div class="form-grid">{% for field in form.visible_fields %}{% include 'workspace/field.html' %}{% endfor %}</div><button type="submit" {% if unavailable %}disabled{% endif %}>Valider</button></form></section>
+{% if booking %}<a href="{% url 'planning:booking-detail' site.pk booking.pk %}">Revenir à la réservation</a>{% else %}<a href="{% url 'planning:booking-availability' site.pk %}">Revenir aux disponibilités</a>{% endif %}
+{% endblock %}

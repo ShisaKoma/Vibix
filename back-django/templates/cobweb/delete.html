@@ -1,0 +1,7 @@
+{% extends 'workspace/base.html' %}
+{% load ui %}
+{% block title %}Supprimer une entrée — Cobweb — ViBix{% endblock %}
+{% block breadcrumb %}<span aria-hidden="true">/</span><a href="{% url 'cobweb:list' site.pk %}">{% module_label "cobweb" %}</a><span aria-hidden="true">/</span><span>Suppression</span>{% endblock %}
+{% block workspace_content %}
+<section class="panel delete-panel"><p class="eyebrow">Cobweb</p><h1>{% ui_icon "cobweb" %}Supprimer cette entrée ?</h1><h2>{{ item.title }}</h2><p>Site : {{ site.name }} · Catégorie : {{ item.category.label }}</p><p class="notice">Cette action supprime définitivement l’entrée et son contenu. Elle ne peut pas être annulée.</p><form method="post" novalidate>{% csrf_token %}{{ form.version }}{% if form.errors %}<div role="alert">{{ form.non_field_errors }}{{ form.version.errors }}{{ form.confirm.errors }}</div>{% endif %}{% include 'workspace/field.html' with field=form.confirm %}<div class="form-actions"><a class="secondary-button" href="{{ return_url }}">Conserver l’entrée</a><button class="danger-button" type="submit">Supprimer définitivement</button></div></form></section>
+{% endblock %}

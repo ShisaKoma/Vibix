@@ -1,0 +1,31 @@
+{% load static ui %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ViBix{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/vibix-icon.svg' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <script src="{% static 'js/ui-components.js' %}" defer></script>
+  {% block extra_scripts %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+  <header>
+    <a href="{% url 'dashboard' %}" class="brand"><img src="{% static 'img/vibix-icon.svg' %}" width="32" height="32" alt="">ViBix</a>
+    {% if user.is_authenticated %}
+    <nav aria-label="Navigation principale">
+      <span>{{ user.get_full_name|default:user.username }}</span>
+      {% if user.is_superuser and user.is_staff %}<a href="{% url 'admin:index' %}">{% module_label "administration" %}</a>{% endif %}
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">{% ui_icon "logout" %}<span class="cta-label">Déconnexion</span></button></form>
+    </nav>
+    {% endif %}
+  </header>
+  <main id="main">
+    {% for message in messages %}<p class="success-message" role="status">{{ message }}</p>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

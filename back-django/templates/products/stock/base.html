@@ -1,0 +1,11 @@
+{% extends 'products/base.html' %}
+{% block products_content %}
+<nav class="form-actions" aria-label="Gestion des stocks">
+<a href="{% url 'products:stock-list' site.pk %}">Stocks et seuils</a>
+<a href="{% url 'products:stock-items' site.pk %}">Déclinaisons suivies</a>
+<a href="{% url 'products:stock-locations' site.pk %}">Dépôts et emplacements</a>
+<a href="{% url 'products:stock-operations' site.pk %}">Mouvements</a>
+<a href="{% url 'products:stock-inventories' site.pk %}">Inventaires</a>
+</nav>
+{% block stock_content %}{% endblock %}
+{% endblock %}

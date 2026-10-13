@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load site_permissions ui %}
+{% block content %}
+{% site_permission site 'planning.view_event' as can_view_planning %}
+{% site_permission site 'planning.view_booking' as can_view_bookings %}
+{% site_permission site 'products.view_product' as can_view_products %}
+{% site_permission site 'addressbook.view_entry' as can_view_addressbook %}
+{% site_permission site 'contacts.view_contactrequest' as can_view_contacts %}
+{% site_permission site 'articles.view_article' as can_view_articles %}
+{% site_permission site 'pages.view_page' as can_view_pages %}
+{% site_permission site 'cobweb.view_cobwebitem' as can_view_cobweb %}
+{% site_permission site 'cobweb.view_cobwebgroup' as can_view_groups %}
+{% site_permission site 'media.view_asset' as can_view_media %}
+{% site_permission site 'tenancy.manage_site_settings' as can_manage_settings %}
+<div class="workspace">
+  <aside class="workspace-sidebar" aria-label="Espace du site">
+    <p class="eyebrow">Espace de travail</p>
+    <div class="site-sidebar-identity">
+      {% if site.icon %}<img class="site-icon" src="{% url 'site-icon' site.pk %}" width="32" height="32" alt="">{% endif %}
+      <h2>{{ site.name }}</h2>
+    </div>
+    <a class="site-switch" href="{% url 'dashboard' %}">{% ui_icon "sites" %} Changer de site</a>
+    <nav class="sidebar-nav" aria-label="Modules du site">
+      {% if can_view_products and site.pk != 1 %}<div class="sidebar-section"><p class="sidebar-label">Catalogue</p><a href="{% url 'products:list' site.pk %}" {% if products_active %}aria-current="page"{% endif %}>{% module_label "products" %}</a></div>{% endif %}
+      <a href="{% url 'site-workspace' site.pk %}" {% if request.resolver_match.url_name == 'site-workspace' %}aria-current="page"{% endif %}>{% module_label "overview" %}</a>
+      {% if can_view_planning and site.pk != 1 %}<div class="sidebar-section"><p class="sidebar-label">Événements</p><a href="{% url 'planning:calendar' site.pk %}" {% if planning_active %}aria-current="page"{% endif %}>{% module_label "planning" %}</a><a href="{% url 'planning:resources' site.pk %}">Ressources</a></div>{% endif %}
+      {% if can_view_bookings and site.pk != 1 %}<div class="sidebar-section"><p class="sidebar-label">Réservations internes</p><a href="{% url 'planning:booking-list' site.pk %}">Réservations</a>{% if can_view_products %}<a href="{% url 'planning:booking-availability' site.pk %}">Disponibilités</a>{% endif %}</div>{% endif %}
+      {% if can_view_contacts and site.pk != 1 %}
+      <div class="sidebar-section"><p class="sidebar-label">Demandes</p><a href="{% url 'contacts:list' site.pk %}" {% if contacts_active %}aria-current="page"{% endif %}>{% module_label 'contacts' %}</a></div>
+      {% endif %}
+      {% if can_view_addressbook and site.pk != 1 %}
+      <div class="sidebar-section"><p class="sidebar-label">Relations</p><a href="{% url 'addressbook:list' site.pk %}" {% if addressbook_active %}aria-current="page"{% endif %}>{% module_label "addressbook" %}</a></div>
+      {% endif %}
+      {% if can_view_pages or can_view_articles or can_view_cobweb or can_view_groups %}
+      <div class="sidebar-section">
+        <p class="sidebar-label">Contenus</p>
+        {% if can_view_pages %}<a href="{% url 'pages:list' site.pk %}" {% if pages_active %}aria-current="page"{% endif %}>{% module_label "pages" %}</a>{% endif %}
+        {% if can_view_articles %}<a href="{% url 'articles:list' site.pk %}" {% if articles_active %}aria-current="page"{% endif %}>{% module_label "articles" %}</a>{% endif %}
+        {% if can_view_cobweb or can_view_groups %}
+        <details class="sidebar-group" {% if cobweb_active %}open{% endif %}>
+          <summary {% if cobweb_active %}class="is-active"{% endif %}>{% module_label "cobweb" %}</summary>
+          <div class="sidebar-subnav">
+            {% if can_view_cobweb %}{% cobweb_functions %}{% endif %}
+            {% if can_view_groups %}<a href="{% url 'cobweb:slideshow-list' site.pk %}" {% if slideshow_mode %}aria-current="page"{% endif %}>{% module_label "slideshow" %}</a>{% endif %}
+            <hr class="sidebar-separator" aria-hidden="true">
+            {% if can_view_cobweb %}<a href="{% url 'cobweb:list' site.pk %}" {% if cobweb_active and not groups_active and not cobweb_function %}aria-current="page"{% endif %}>{% module_label "entries" %}</a>{% endif %}
+            {% if can_view_groups %}<a href="{% url 'cobweb:group-list' site.pk %}" {% if groups_active and not slideshow_mode and not cobweb_function %}aria-current="page"{% endif %}>{% module_label "groups" %}</a>{% endif %}
+          </div>
+        </details>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% if can_view_media or can_manage_settings %}
+      <div class="sidebar-section">
+        <p class="sidebar-label">Gestion du site</p>
+        {% if can_view_media %}<a href="{% url 'media:list' site.pk %}" {% if request.resolver_match.namespace == 'media' %}aria-current="page"{% endif %}>{% module_label "media" %}</a>{% endif %}
+        {% if can_manage_settings %}<a href="{% url 'configuration:site-settings' site.pk %}" {% if request.resolver_match.namespace == 'configuration' %}aria-current="page"{% endif %}>{% module_label "settings" %}</a>{% endif %}
+      </div>
+      {% endif %}
+    </nav>
+    <div class="sidebar-note"><strong>Vos contenus</strong><p>Gérez les pages, les articles et les contenus Cobweb de votre site.</p></div>
+  </aside>
+  <div class="workspace-content">
+    <nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="{% url 'dashboard' %}">{% module_label "sites" %}</a><span aria-hidden="true">/</span><a href="{% url 'site-workspace' site.pk %}">{{ site.name }}</a>{% block breadcrumb %}{% endblock %}</nav>
+    {% block workspace_content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

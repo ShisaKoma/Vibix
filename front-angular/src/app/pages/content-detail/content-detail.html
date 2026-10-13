@@ -1,0 +1,7 @@
+<a class="back-link" [routerLink]="base">← {{ module === 'articles' ? 'Toutes les actualités' : 'Toutes les pages' }}</a>
+@if (state().loading) { <p class="empty" role="status">Chargement du contenu…</p> }
+@else if (state().item; as content) {
+  <article class="article-detail"><p class="eyebrow">{{ label(content.categoryId) }}</p><h1>{{ content.title }}</h1><p class="intro">{{ content.description }}</p>@if (content.picture; as image) { <img class="detail-image" [src]="image.url" [alt]="image.altText" [width]="image.width" [height]="image.height"> }<div class="rich-content" [innerHTML]="content.contentHtml"></div>@if (content.gallery?.length) { <section class="editorial-gallery" aria-label="Galerie d’images"><h2>Galerie</h2><div class="cards">@for (entry of content.gallery; track entry.asset.id) { <figure><img [src]="entry.asset.url" [alt]="entry.asset.altText" [width]="entry.asset.width" [height]="entry.asset.height" loading="lazy"><figcaption>{{ entry.asset.altText }}</figcaption></figure> }</div></section> }</article>
+} @else {
+  <section class="empty"><h1>Contenu indisponible</h1><p role="status">{{ state().error || 'Ce contenu n’existe pas ou n’est plus publié.' }}</p><a [routerLink]="base">Revenir à la liste</a></section>
+}

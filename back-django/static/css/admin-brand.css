@@ -1,0 +1,2 @@
+#site-name a { display: inline-flex; align-items: center; gap: .65rem; }
+#site-name img { flex-shrink: 0; border-radius: .5rem; }

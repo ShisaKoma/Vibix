@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block title %}Mes sites — ViBix{% endblock %}
+{% block content %}
+<h1>{% module_label "sites" %}</h1>
+<p>Choisissez votre espace de travail pour consulter les modules et valider les premiers parcours.</p>
+<div class="grid">
+  {% for card in sites %}
+  <section class="panel site-card">
+    <div class="site-card-heading">
+      {% if card.site.icon %}<img class="site-icon" src="{% url 'site-icon' card.site.pk %}" width="48" height="48" alt="">{% else %}<span class="site-icon site-icon-placeholder" aria-hidden="true">{{ card.site.name|first|upper }}</span>{% endif %}
+      <div><h2>{{ card.site.name }}</h2><span class="muted">{{ card.site.code }}</span></div>
+    </div>
+    {% if card.site.description %}<p class="site-card-description">{{ card.site.description }}</p>{% endif %}
+    <p><a class="button-link" href="{% url 'site-workspace' card.site.pk %}">Ouvrir l’espace de travail</a></p>
+    {% if card.can_manage_settings %}<a href="{% url 'configuration:site-settings' card.site.pk %}">Paramètres du site</a>{% endif %}
+  </section>
+  {% empty %}
+  <section class="panel"><h2>Aucun site attribué</h2><p>Contactez votre administrateur pour obtenir un accès.</p></section>
+  {% endfor %}
+</div>
+{% endblock %}
